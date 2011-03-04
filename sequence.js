@@ -87,7 +87,7 @@
         }
         
 
-        //  Hide the currently finished video
+        //  Hide the currently ending video
         media.style.display = "none";
 
         //  Constrain dimentions
