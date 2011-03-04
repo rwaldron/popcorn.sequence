@@ -1,7 +1,8 @@
 //  Requires Popcorn.js
 (function( global, Popcorn ) {
   
-  var doc = global.document;
+  var doc = global.document, 
+      rprotocol = /:\/\//;
 
   Popcorn.sequence = function( mediaId, list ) {
     return new Popcorn.sequence.init( mediaId, list );
@@ -25,7 +26,7 @@
     this.queue.push( this.video );
     
     //  Create the Popcorn object list
-    this.sequenced = [];
+    this.playlist = [];
     
     //  Create dimensions store    
     this.dims = {
@@ -60,7 +61,7 @@
         
       }
       
-      media.src = location.href + src;
+      media.src = !rprotocol.test( src ) ? location.href + src : src;
       
       media.setAttribute("data-sequence-owner", mediaId );
       media.setAttribute("data-sequence-guid", self.seqId );
@@ -119,8 +120,8 @@
       }, false);
       
       //  Add a Popcorn object instance to the 
-      //  sequenced video list
-      self.sequenced.push( Popcorn("#" + media.id) );
+      //  playlist video list
+      self.playlist.push( Popcorn("#" + media.id) );
       
     });
     
@@ -131,8 +132,44 @@
   
   //  Sequence object prototype
   Popcorn.extend( Popcorn.sequence.prototype, {
-    get: function( idx ) {
-      return this.sequenced[ idx ];
+  
+    //  Returns Popcorn object from sequence at index
+    eq: function( idx ) {
+      return this.playlist[ idx ];
+    }, 
+    
+    //  Returns sum duration for all videos in sequence
+    duration: function() {
+      
+      var ret = 0, 
+          seq = this.playlist;
+      
+      for ( var i = 0; i < seq.length; i++ ) {
+        ret += seq[ i ].video.duration;
+      }
+      
+      return ret;
+    }, 
+    
+    //  Binds event handlers that fire only when all 
+    //  videos in sequence have heard the event
+    listen: function( type, callback ) {
+      
+      var seq = this.playlist,
+          total = seq.length, 
+          count = 0;
+      
+      Popcorn.forEach( seq, function( video ) {
+      
+        video.listen( type, function( event ) {
+          
+          if ( ++count === total ) {
+            callback && callback.call( video, event )
+          }
+          
+        });
+      
+      });
     }
   });
 

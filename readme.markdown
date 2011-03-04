@@ -12,7 +12,7 @@ A little something like this...
 
 And stuff like this...
 
-	sequence.get( 0 );
+	sequence.eq( 0 );
 	
 	// returns a Popcorn object for "assets/snowdriving.ogv"
 	
