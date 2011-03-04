@@ -24,6 +24,9 @@
     //  Push the initial target video into the queue
     this.queue.push( this.video );
     
+    //  Create the Popcorn object list
+    this.sequenced = [];
+    
     //  Create dimensions store    
     this.dims = {
       width: this.video.videoWidth,
@@ -48,6 +51,8 @@
         media.controls = true;
 
         media.style.display = "none";
+        
+        media.id = self.seqId + "-" + idx ;
         
         self.queue.push( media );
         
@@ -103,13 +108,33 @@
         if ( !!nextId ) {
           //  Play the next video in the sequence
           self.queue[ nextId ].play();
-        }        
+        }
+        
+        //  When reseting to first video
+        if ( !nextId ) {
+          //  Reset currentTime to 0
+          self.queue[ nextId ].currentTime = 0;
+        }
         
       }, false);
+      
+      //  Add a Popcorn object instance to the 
+      //  sequenced video list
+      self.sequenced.push( Popcorn("#" + media.id) );
+      
     });
     
     return this;
   };
+  
+  Popcorn.sequence.init.prototype = Popcorn.sequence.prototype;
+  
+  //  Sequence object prototype
+  Popcorn.extend( Popcorn.sequence.prototype, {
+    get: function( idx ) {
+      return this.sequenced[ idx ];
+    }
+  });
 
   
 })( this, Popcorn );
