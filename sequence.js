@@ -1,10 +1,7 @@
 //  Requires Popcorn.js
-
 (function( global, Popcorn ) {
   
   var doc = global.document;
-
-
 
   Popcorn.sequence = function( mediaId, list ) {
     return new Popcorn.sequence.init( mediaId, list );
