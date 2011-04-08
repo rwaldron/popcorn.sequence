@@ -1,3 +1,4 @@
+/*
 var localMediaList = [
       "assets/snowdriving.ogv",
       "assets/eich.ogv",
@@ -224,15 +225,7 @@ test("remote media", function () {
     plus();
     
   });
-  
-/*
-  seq.listen( "canplaythrough", function( event ) {
-  
-    ok( true, "`canplaythrough` fired for all in sequence" );
-    plus();
-    
-  });  
-*/
+
 });
 
 
@@ -279,4 +272,4 @@ test("Normalized Dimensions", function () {
   });
   
 });
-
+*/

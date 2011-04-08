@@ -7,28 +7,31 @@
 $(function() {
 
 
-	var localMediaObjs = [
-		    { 
-		    	src: "assets/snowdriving.ogv", 
-		    	in: 22
-		    }, 
-		    {
-		    	src: "assets/eich.ogv",
-		    	in: 5, 
-		    	out: 10
-		    }, 
-		    {
-					src: "assets/crockford.ogv", 
-					out: 10
-		    }
-		  ],  
-			$seq;
+  var clips = [
+        { 
+          src: "assets/snowdriving.ogv", 
+          in: 10,
+          out: 13
+        }, 
+        {
+          src: "assets/eich.ogv",
+          in: 8, 
+          out: 11
+        }, 
+        {
+          src: "assets/crockford.ogv", 
+          in: 3,
+          out: 6
+        }
+      ],  
+      $seq;
 
-	$seq = Popcorn.sequence( "seq-fixture", localMediaObjs );
+  $seq = Popcorn.sequence( "seq-fixture", clips );
 
 
-	$seq.play();
+  $seq.play();
 
-	window.$seq = $seq;
+
+  window.$seq = $seq;
 
 });

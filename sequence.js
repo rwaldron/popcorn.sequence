@@ -1,7 +1,7 @@
 //  Requires Popcorn.js
 (function( global, Popcorn ) {
 
-	//	TODO: as support increases, migrate to element.dataset 
+  //  TODO: as support increases, migrate to element.dataset 
   
   var doc = global.document, 
       rprotocol = /:\/\//, 
@@ -36,38 +36,19 @@
     };
 
     this.active = 0;
+    this.cycling = false;
+    this.playing = false;
+
+    this.times = {
+      last: 0
+    };
 
     var self = this;
 
     //  Create `video` elements
     Popcorn.forEach( list, function( media, idx ) {
       
-      var video = doc.createElement( "video" ), 
-
-      		//	Context sensitive callbacks
-          loadedMetaData = function( event ) {
-
-          	var target = event.srcElement;
-
-            //  If no out point was set for this clip, set it to the duration of the video
-            self.clips[ idx ].out = ( !self.clips[ idx ].out && target.duration ) || self.clips[ idx ].out;
-
-            //  If this is idx zero, use it as dimension for all
-            if ( !idx ) {
-              self.dims.width = event.srcElement.videoWidth;
-              self.dims.height = event.srcElement.videoHeight;
-            }
-            
-            video.removeEventListener( "loadedmetadata", loadedMetaData, false );
-          }, 
-          canPlayThrough = function( event ) {
-
-            self.queue[ idx ].currentTime = self.clips[ idx ].in;
-
-            self.queue[ idx ].setAttribute("data-sequence-id", [ self.clips[ idx ].in, self.clips[ idx ].out ].join(":") );
-
-            video.removeEventListener( "canplaythrough", canPlayThrough, false );
-          };
+      var video = doc.createElement( "video" );
 
 
       //  Setup newly created video element
@@ -84,13 +65,12 @@
 
       //  Push the in/out points into sequence clips
       self.clips.push({ 
-        in: ( "in" in media ) && media.in || 0,
+        in: ( "in" in media ) && media.in || 1,
         out: ( "out" in media ) && media.out || 0,  
       });
 
-      //  Append the video to the place holder element
-      self.place.appendChild( video );
-
+      self.clips[ idx ].out = self.clips[ idx ].out || self.clips[ idx ].in + 2;
+      
       //  Set the sources
       video.src = !rprotocol.test( media.src ) ? lochref + media.src : media.src;
 
@@ -98,56 +78,106 @@
       video.setAttribute("data-sequence-owner", place );
       video.setAttribute("data-sequence-guid", self.seqId );
       video.setAttribute("data-sequence-id", idx );
+      video.setAttribute("data-sequence-clip", [ self.clips[ idx ].in, self.clips[ idx ].out ].join(":") );
+
+      //  Append the video to the place holder element
+      self.place.appendChild( video );
       
+
+      self.playlist.push( Popcorn("#" + video.id ) );      
+
+    });
+
+    Popcorn.forEach( this.queue, function( media, idx ) {
+
+      var //  Context sensitive callbacks
+          canPlayThrough = function( event ) {
+
+            var target = event.srcElement;
+            
+            media.play();
+
+            setTimeout(function() {
+              media.pause();
+            }, 100);
+
+            //  If this is idx zero, use it as dimension for all
+            if ( !idx ) {
+              self.dims.width = media.videoWidth;
+              self.dims.height = media.videoHeight;
+            }
+            
+            media.currentTime = self.clips[ idx ].in - .5;
+
+            media.removeEventListener( "canplaythrough", canPlayThrough, false );
+          };
+
+
       //  Hook up event listeners for managing special playback 
-      video.addEventListener( "loadedmetadata", loadedMetaData, false);
+      media.addEventListener( "canplaythrough", canPlayThrough, false );
 
-      video.addEventListener( "canplaythrough", canPlayThrough, false );
 
-      video.addEventListener( "play", function( event ) {
+      //  TODO: consolidate & DRY
+      media.addEventListener( "play", function( event ) {
 
-        var target = event.srcElement;
+        self.playing = true;
         
-        if ( target.currentTime >= self.clips[ idx ].out || 
-        			target.currentTime < self.clips[ idx ].in  ) {
-
-//setAttribute("data-sequence-id"
-          console.log( "target play event", target, target.currentTime, self.clips[ idx ].out );
-          target.currentTime =  self.clips[ idx ].in;
-        }
-
       }, false );
 
-			video.addEventListener( "timeupdate", function( event ) {
+      media.addEventListener( "pause", function( event ) {
 
-				var target = event.srcElement, 
-						;
-				
-				if ( target.currentTime >= )
-				
-			}, false );
-			
-      video.addEventListener( "ended", function( event ) {
+        self.playing = false;
 
-      	console.log( event.srcElement.src );
+      }, false );      
 
-        var nextId = 0, 
-        		next, clip;
+      media.addEventListener( "timeupdate", function( event ) {
 
-        //  Update to current correct dimensions
-        if ( !self.dims.width ) {
-          self.dims.width = self.dims.width || media.videoWidth;
-          self.dims.height = self.dims.height || media.videoHeight;
-        }
+        var target = event.srcElement, 
+            seqIdx = +target.dataset.sequenceId, 
+            round = Math.round( media.currentTime );
 
-        Popcorn.sequence.cycle( self.queue, self.clips, idx );
 
-      }, false);
+        console.log( seqIdx, self.active, seqIdx === self.active );
 
-      //  Add a Popcorn object instance to the 
-      //  playlist video list
-      self.playlist.push( Popcorn("#" + video.id) );
+        if ( self.times.last !== round && 
+              seqIdx === self.active ) {
 
+          self.times.last = round;
+          
+          if ( round === self.clips[ seqIdx ].out + 1 ) {
+
+            console.log( "apptempting", idx, target.dataset, self.active );          
+
+            Popcorn.sequence.cycle.call( self, seqIdx );
+          }
+          //if (  )
+
+            
+  //        if ( ( ceil < self.clips[ idx ].in || 
+  //                 floor >= self.clips[ idx ].out ) && !self.cycling && self.playing ) {
+/*
+          if ( floor >= self.clips[ idx ].out && !self.cycling ) {
+
+            self.cycling = true;
+
+            if ( idx !== self.active ) {
+              return;
+            }
+
+            console.log( "apptempting", idx, target.dataset, self.active );          
+          
+            Popcorn.sequence.cycle.call( self, idx );
+
+          } else {
+*/
+  //          //console.log( idx, "timeupdate event, could not cycle" );
+  //          //console.log( idx, "in", ceil < self.clips[ idx ].in, ceil, self.clips[ idx ].in );
+  //          //console.log( idx, "out", ceil >= self.clips[ idx ].out, ceil, self.clips[ idx ].out );
+  //          //console.log( !self.cycling, self.playing );
+
+//          }
+        }        
+      }, false );
     });
 
     return this;
@@ -155,50 +185,69 @@
 
   Popcorn.sequence.init.prototype = Popcorn.sequence.prototype;
 
-  Popcorn.sequence.cycle = function( queue, clips, currentIdx ) {
+  Popcorn.sequence.cycle = function( idx ) {
 
-		var current = queue[ currentIdx ], 
-				nextIdx, next, clip;
+    ////console.log( seq, idx );
+
+    var queue = this.queue, 
+        clips = this.clips, 
+        current = queue[ idx ], 
+        nextIdx = 0, 
+        next, clip, $pop;
 
 
-    if ( queue[ currentIdx + 1 ] ) {
-      nextIdx = currentIdx + 1;
+    if ( queue[ idx + 1 ] ) {
+      nextIdx = idx + 1;
     }
 
     //  Reset queue
-    if ( !queue[ currentIdx + 1 ] ) {
+    if ( !queue[ idx + 1 ] ) {
       nextIdx = 0;
     }
 
-		next = queue[ nextIdx ];
-		clip = clips[ nextIdx ];
+    next = queue[ nextIdx ];
+    clip = clips[ nextIdx ];
 
+    //  Constrain dimentions
+    Popcorn.extend( next, {
+      width: this.dims.width, 
+      height: this.dims.height
+    });
 
     //  Hide the currently ending video
     current.style.display = "none";
-
-//    //  Constrain dimentions
-//    Popcorn.extend( next, {
-//      width: self.dims.width, 
-//      height: self.dims.height
-//    });
-
     //  Show the next video in the sequence    
     next.style.display = "";
 
+    $popnext = this.playlist[ nextIdx ];
     //  When not resetting to 0
-    if ( !!nextIdx ) {
+    //if ( !!nextIdx ) {
 
-			next.currentTime = clip.in;
-    
+      current.pause();
+
+      this.active = nextIdx;
+      this.times.last = clip.in - 1;
+
+
       //  Play the next video in the sequence
-			next.play();
-    }
+      $popnext.currentTime( clip.in );
+
+      console.log( $popnext.video.readyState );
+      
+
+      $popnext.play();
+
+      
+
+      //next.play();
+      
+      this.cycling = false;
+    //}
 
     //  When reseting to first video
-    if ( !nextId ) {
+    if ( !nextIdx ) {
       //  Reset currentTime to 0
-      next.currentTime = clip.in;
+      //next.currentTime = clip.in;
     }
   
   };
@@ -212,40 +261,44 @@
     }, 
     
     //  Returns sum duration for all videos in sequence
-    duration: function() {
+    duration: function( clips ) {
       
       var ret = 0, 
           seq = this.playlist;
       
       for ( var i = 0; i < seq.length; i++ ) {
-        ret += seq[ i ].video.duration;
+        if ( !clips ) {
+          ret += seq[ i ].video.duration;
+        } else {
+          ret += this.clips[ i ].out - this.clips[ i ].in;
+        }
       }
-      
+
       return ret;
-    }, 
+    },
 
     play: function() {
 
-      console.log( this );
-   
-    }, 
-    
+      //console.log( this );
+
+    },
+
     //  Binds event handlers that fire only when all 
     //  videos in sequence have heard the event
     listen: function( type, callback ) {
-      
+
       var seq = this.playlist,
           total = seq.length, 
           count = 0;
-      
+
       Popcorn.forEach( seq, function( video ) {
-      
+
         video.listen( type, function( event ) {
-          
+
           if ( ++count === total ) {
             callback && callback.call( video, event )
           }
-          
+
         });
       });
     }
