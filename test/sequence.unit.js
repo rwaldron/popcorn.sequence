@@ -1,4 +1,10 @@
-var localMediaList = [
+
+var useOgv = document.createElement("video").canPlayType("video/ogg") === "maybe" && 
+                  !document.createElement("video").canPlayType("video/mp4"), 
+
+    useType = useOgv && ".ogv" || "_512kb.mp4", 
+    
+    localMediaList = [
       { 
         src: "assets/snowdriving.ogv", 
         in: 10,
@@ -12,50 +18,43 @@ var localMediaList = [
     ],  
     remoteMediaList = [
       {
-        src: "http://ia600208.us.archive.org/5/items/Brunette_2/Brunette_2_512kb.mp4", 
+        src: "http://ia600208.us.archive.org/5/items/Brunette_2/Brunette_2" + useType,  
         in: 3,
         out: 6
       },
       {
-        src: "http://ia600208.us.archive.org/0/items/Blonde_2/Blonde_2_512kb.mp4", 
+        src: "http://ia600208.us.archive.org/0/items/Blonde_2/Blonde_2" + useType,  
         in: 6,
         out: 9
       }
     ], 
     mixedSourceList = [
       {
-        src: "http://ia600102.us.archive.org/23/items/HotNumber/HotNumber_512kb.mp4", 
+        src: "http://ia600102.us.archive.org/23/items/HotNumber/HotNumber" + useType,  
         in: 0, 
-        out: 5
+        out: 2
       },
       {
-        src: "http://ia600102.us.archive.org/23/items/HotNumber/HotNumber_512kb.mp4", 
-        in: 10, 
-        out: 14
+        src: "http://ia600102.us.archive.org/23/items/HotNumber/HotNumber" + useType,  
+        in: 5, 
+        out: 7
       },
       {
-        src: "http://ia600208.us.archive.org/5/items/Brunette_2/Brunette_2_512kb.mp4", 
-        in: 7,
+        src: "http://ia600208.us.archive.org/5/items/Brunette_2/Brunette_2" + useType,  
+        in: 8,
         out: 10
       }, 
       {
         src: "assets/snowdriving.ogv",
-        in: 3,
-        out: 6
+        in: 11,
+        out: 13
       }, 
       {
-        src: "http://ia600208.us.archive.org/0/items/Blonde_2/Blonde_2_512kb.mp4",
-        in: 20,
-        out: 22
-      },      
-      {
-        src: "http://ia600400.us.archive.org/8/items/TripDownMarketStreetrBeforeTheFire/TripDownMktStreet_clean_512kb.mp4",
-        in: 2,
-        out: 6
+        src: "http://ia600208.us.archive.org/0/items/Blonde_2/Blonde_2" + useType, 
+        in: 14,
+        out: 16
       }
     ];
-
-
 
 //$seq = Popcorn.sequence( "seq-fixture", clips );
 //$seq.play();
@@ -276,83 +275,87 @@ test("remote media", function() {
     
   });
 });
-module("Events");
-test("local media", function () {
+
+console.log(useOgv  );
+if ( !useOgv ) {
+
+  module("Events");
+  test("local media", function () {
 
 
-  var expects = 2, 
-      count = 0;
+    var expects = 2, 
+        count = 0;
 
-  expect(expects);
-  
-  function plus() { 
-    if ( ++count === expects ) {
-      start(); 
-    }
-  }  
-  
-  stop();
-  
-  var seq = Popcorn.sequence( "video-sequence-a", localMediaList );
-  
-  seq.listen( "loadedmetadata", function( event ) {
-  
-    ok( true, "`loadedmetadata` fired for all in sequence" );
-    plus();
+    expect(expects);
     
-  });
-  
-
-  seq.listen( "canplaythrough", function( event ) {
-  
-    ok( true, "`canplaythrough` fired for all in sequence" );
-    plus();
+    function plus() { 
+      if ( ++count === expects ) {
+        start(); 
+      }
+    }  
     
-  });  
-  
-});
+    stop();
+    
+    var seq = Popcorn.sequence( "video-sequence-a", localMediaList );
+    
+    seq.listen( "loadedmetadata", function( event ) {
+    
+      ok( true, "`loadedmetadata` fired for all in sequence" );
+      plus();
+      
+    });
+    
 
-test("remote media", function () {
-
-
-  var expects = 2, 
-      count = 0;
-
-  expect(expects);
-  
-  function plus() { 
-    if ( ++count === expects ) {
-      start(); 
-    }
-  }  
-  
-  stop();
-  
-  var seq = Popcorn.sequence( "video-sequence-a", remoteMediaList );
-  
-  seq.listen( "loadedmetadata", function( event ) {
-  
-    ok( true, "`loadedmetadata` fired for all in sequence" );
-    plus();
+    seq.listen( "canplaythrough", function( event ) {
+    
+      ok( true, "`canplaythrough` fired for all in sequence" );
+      plus();
+      
+    });  
     
   });
 
-  seq.listen( "canplaythrough", function( event ) {
-  
-    ok( true, "`canplaythrough` fired for all in sequence" );
+  test("remote media", function () {
 
-    plus();
+
+    var expects = 2, 
+        count = 0;
+
+    expect(expects);
     
-  });  
+    function plus() { 
+      if ( ++count === expects ) {
+        start(); 
+      }
+    }  
+    
+    stop();
+    
+    var seq = Popcorn.sequence( "video-sequence-a", remoteMediaList );
+    
+    seq.listen( "loadedmetadata", function( event ) {
+    
+      ok( true, "`loadedmetadata` fired for all in sequence" );
+      plus();
+      
+    });
 
-});
+    seq.listen( "canplaythrough", function( event ) {
+    
+      ok( true, "`canplaythrough` fired for all in sequence" );
 
+      plus();
+      
+    });  
 
+  });
+
+}
 
 module("Player");
 test("Normalized Dimensions", function () {
   
-  var expects = 6, 
+  var expects = 4, 
       count = 0;
 
   expect(expects);
@@ -397,7 +400,7 @@ test("Normalized Dimensions", function () {
 module("Playback");
 test("Reference Tests", function () {
   
-  var expects = 13, 
+  var expects = 11, 
       count = 0;
 
   expect(expects);
@@ -406,25 +409,25 @@ test("Reference Tests", function () {
     if ( ++count === expects ) {
       start(); 
     }
-  }  
-  
-  stop(30000);
+  }
+
+  stop(35000);
 
 
-  var seq = Popcorn.sequence( "video-sequence-b", mixedSourceList ), 
+  var seq = Popcorn.sequence( "video-sequence-b", mixedSourceList ),
       dims = {
-        width: 0, 
+        width: 0,
         height: 0
       };
-
-  [ 4, 7, 11, 15, 19, 22 ].forEach(function( time, idx ) {
+  //[ 4, 7, 11, 15, 19, 22 ]
+  [ 1, 4, 7, 10, 13 ].forEach(function( time, idx ) {
 
     seq.exec( time, function() {
       //console.log( seq.active, time );
       equal( seq.active, idx, "video " + idx + " is active" );
       plus();
 
-			// currentSrc will force resources to have abs url, thus making local resources unmatchable
+      // currentSrc will force resources to have abs url, thus making local resources unmatchable
       ok( seq.queue[ idx ].currentSrc.indexOf(mixedSourceList[ idx ].src) > -1, "seq.queue[ idx ].currentSrc same as mixedSourceList[ idx ].src" );
       plus();
     });

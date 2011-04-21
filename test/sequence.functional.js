@@ -7,14 +7,19 @@
 $(function() {
 
 
-  var clips = [
+  var 
+		useOgv = document.createElement("video").canPlayType("video/ogg") === "maybe" && 
+									!document.createElement("video").canPlayType("video/mp4"), 
+
+		useType = useOgv && ".ogv" || "_512kb.mp4", 
+  	clips = [
       {
-        src: "http://ia600102.us.archive.org/23/items/HotNumber/HotNumber_512kb.mp4", 
+        src: "http://ia600102.us.archive.org/23/items/HotNumber/HotNumber" + useType,  
         in: 0, 
         out: 5
       },
       {
-        src: "http://ia600208.us.archive.org/5/items/Brunette_2/Brunette_2_512kb.mp4", 
+        src: "http://ia600208.us.archive.org/5/items/Brunette_2/Brunette_2" + useType,  
         in: 7,
         out: 10
       },
@@ -24,12 +29,12 @@ $(function() {
         out: 6
       },
       {
-        src: "http://ia600208.us.archive.org/0/items/Blonde_2/Blonde_2_512kb.mp4",
+        src: "http://ia600208.us.archive.org/0/items/Blonde_2/Blonde_2" + useType, 
         in: 20,
         out: 22
       },
       {
-        src: "http://ia600400.us.archive.org/8/items/TripDownMarketStreetrBeforeTheFire/TripDownMktStreet_clean_512kb.mp4",
+        src: "http://ia600400.us.archive.org/8/items/TripDownMarketStreetrBeforeTheFire/TripDownMktStreet_clean" + useType, 
         in: 2,
         out: 6
       }

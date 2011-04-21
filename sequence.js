@@ -111,7 +111,7 @@
       var //  Context sensitive callbacks
           canPlayThrough = function( event ) {
 
-            var target = event.srcElement;
+            var target = event.srcElement || event.target;
             
             media.play();
 
@@ -150,8 +150,8 @@
 
       media.addEventListener( "timeupdate", function( event ) {
 
-        var target = event.srcElement, 
-            seqIdx = +target.dataset.sequenceId, 
+        var target = event.srcElement || event.target, 
+            seqIdx = +( target.dataset && target.dataset.sequenceId || target.getAttribute("data-sequence-id") ), 
             round = Math.round( media.currentTime );
 
         if ( self.times.last !== round && 
@@ -201,11 +201,6 @@
       height: this.dims.height
     });
 
-    //  Hide the currently ending video
-    current.style.display = "none";
-    //  Show the next video in the sequence    
-    next.style.display = "";
-
     $popnext = this.playlist[ nextIdx ];
     $popprev = this.playlist[ idx ];
 
@@ -222,6 +217,13 @@
 
     //  Set the previous back to it's beginning time
     $popprev.currentTime( clips[ idx ].in );
+
+    if ( nextIdx ) {
+      //  Hide the currently ending video
+      current.style.display = "none";
+      //  Show the next video in the sequence    
+      next.style.display = "";    
+    }
 
     this.cycling = false;
 
