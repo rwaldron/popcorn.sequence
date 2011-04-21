@@ -146,7 +146,7 @@ test("sequence( media, array )", function() {
 
 test("Popcorn.sequence.prototype", function() {
   
-  var expects = 4, 
+  var expects = 3, 
       seq = Popcorn.sequence( "video-sequence-a", localMediaList ), 
       fns = Object.getOwnPropertyNames( Popcorn.sequence.prototype );
 
@@ -155,7 +155,6 @@ test("Popcorn.sequence.prototype", function() {
 
   expect( expects );
   
-  console.log( seq );
   //  PROTOTYPE FNS
 
   fns.forEach(function( prop, idx ) {
@@ -168,10 +167,6 @@ test("Popcorn.sequence.prototype", function() {
   //  TODO write typeof tests for all the own props
   
   ok( seq.eq( 1 ) instanceof Popcorn, "seq.eq( 1 ) instanceof Popcorn" );
-  
-  
-
-
   
   seq.playlist.forEach( function( item ) {
     
@@ -379,7 +374,7 @@ test("Normalized Dimensions", function () {
   seq.listen( "loadedmetadata", function( event ) {
 
     //console.log( "loaded" );
-    console.log( seq );
+    //console.log( seq );
     seq.playlist.forEach( function( $p, idx ) {
       
       if ( !dims.width ) {
@@ -413,7 +408,7 @@ test("Reference Tests", function () {
     }
   }  
   
-  stop(60000);
+  stop(30000);
 
 
   var seq = Popcorn.sequence( "video-sequence-b", mixedSourceList ), 
@@ -442,11 +437,8 @@ test("Reference Tests", function () {
   seq.listen( "loadedmetadata", function( event ) {
 
     equal( event.type, "loadedmetadata", "Artificial bubbling occurred" );
-    
-    seq.listen("timeupdate", function( event ) {
-      //console.log( "timeupdate", this, event );
-      //console.log( "timeupdate", this );
-    });
+
+    //window.seq = seq;
 
     seq.play();
   });

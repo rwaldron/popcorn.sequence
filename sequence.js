@@ -229,8 +229,6 @@
     if ( !nextIdx ) {
       //  Reset currentTime to 0
       //next.currentTime = clip.in;
-
-      
     }
   
   };
