@@ -25,6 +25,8 @@
 
     //  Create the clips
     this.clips = [];
+
+    this.offs = [];
     
     //  Create the Popcorn object list
     this.playlist = [];
@@ -43,7 +45,8 @@
       last: 0
     };
 
-    var self = this;
+    var self = this, 
+        clipOffset;
 
     //  Create `video` elements
     Popcorn.forEach( list, function( media, idx ) {
@@ -86,6 +89,21 @@
 
       self.playlist.push( Popcorn("#" + video.id ) );      
 
+    });
+
+    var clipOffset = 0;
+
+    self.clips.forEach(function( obj ) {
+
+      var clipDuration = obj.out - obj.in, 
+          offs = {
+            in: clipOffset,
+            out: clipOffset + clipDuration
+          };
+
+      self.offs.push( offs );
+      
+      clipOffset = offs.out + 1;
     });
 
     Popcorn.forEach( this.queue, function( media, idx ) {
@@ -136,9 +154,6 @@
             seqIdx = +target.dataset.sequenceId, 
             round = Math.round( media.currentTime );
 
-
-        console.log( seqIdx, self.active, seqIdx === self.active );
-
         if ( self.times.last !== round && 
               seqIdx === self.active ) {
 
@@ -146,36 +161,8 @@
           
           if ( round === self.clips[ seqIdx ].out + 1 ) {
 
-            console.log( "apptempting", idx, target.dataset, self.active );          
-
             Popcorn.sequence.cycle.call( self, seqIdx );
           }
-          //if (  )
-
-            
-  //        if ( ( ceil < self.clips[ idx ].in || 
-  //                 floor >= self.clips[ idx ].out ) && !self.cycling && self.playing ) {
-/*
-          if ( floor >= self.clips[ idx ].out && !self.cycling ) {
-
-            self.cycling = true;
-
-            if ( idx !== self.active ) {
-              return;
-            }
-
-            console.log( "apptempting", idx, target.dataset, self.active );          
-          
-            Popcorn.sequence.cycle.call( self, idx );
-
-          } else {
-*/
-  //          //console.log( idx, "timeupdate event, could not cycle" );
-  //          //console.log( idx, "in", ceil < self.clips[ idx ].in, ceil, self.clips[ idx ].in );
-  //          //console.log( idx, "out", ceil >= self.clips[ idx ].out, ceil, self.clips[ idx ].out );
-  //          //console.log( !self.cycling, self.playing );
-
-//          }
         }        
       }, false );
     });
@@ -220,38 +207,36 @@
     next.style.display = "";
 
     $popnext = this.playlist[ nextIdx ];
+    $popprev = this.playlist[ idx ];
+
     //  When not resetting to 0
-    //if ( !!nextIdx ) {
+    current.pause();
 
-      current.pause();
+    this.active = nextIdx;
+    this.times.last = clip.in - 1;
 
-      this.active = nextIdx;
-      this.times.last = clip.in - 1;
+    //  Play the next video in the sequence
+    $popnext.currentTime( clip.in );
 
+    $popnext[ nextIdx ? "play" : "pause" ]();
 
-      //  Play the next video in the sequence
-      $popnext.currentTime( clip.in );
+    //  Set the previous back to it's beginning time
+    $popprev.currentTime( clips[ idx ].in );
 
-      console.log( $popnext.video.readyState );
-      
-
-      $popnext.play();
-
-      
-
-      //next.play();
-      
-      this.cycling = false;
-    //}
+    this.cycling = false;
 
     //  When reseting to first video
     if ( !nextIdx ) {
       //  Reset currentTime to 0
       //next.currentTime = clip.in;
+
+      
     }
   
   };
 
+  var excludes = [ "timeupdate", "play", "pause" ];
+  
   //  Sequence object prototype
   Popcorn.extend( Popcorn.sequence.prototype, {
 
@@ -259,7 +244,10 @@
     eq: function( idx ) {
       return this.playlist[ idx ];
     }, 
-    
+    //  Returns Clip object from sequence at index
+    clip: function( idx ) {
+      return this.clips[ idx ];
+    },
     //  Returns sum duration for all videos in sequence
     duration: function( clips ) {
       
@@ -279,15 +267,47 @@
 
     play: function() {
 
-      //console.log( this );
+      this.playlist[ this.active ].play();
 
+      return this;
     },
+    //  Attach an event to a single point in time
+    exec: function ( time, fn ) {
 
+      var self = this, 
+          index = this.active, 
+          offsetBy;
+      
+      this.offs.forEach(function( off, idx ) {
+        if ( time >= off.in && time <= off.out ) {
+          index = idx;
+        }
+      });
+
+      //offsetBy = time - self.clips[ index ].in;
+      
+      time += this.clips[ index ].in - this.offs[ index ].in;
+
+      //  Creating a one second track event with an empty end
+      Popcorn.addTrackEvent( this.playlist[ index ], {
+        start: time,
+        end: time + 1,
+        _running: false,
+        _natives: {
+          start: fn || Popcorn.nop,
+          end: Popcorn.nop,
+          type: "exec"
+        }
+      });
+
+      return this;
+    },
     //  Binds event handlers that fire only when all 
     //  videos in sequence have heard the event
     listen: function( type, callback ) {
 
-      var seq = this.playlist,
+      var self = this, 
+          seq = this.playlist,
           total = seq.length, 
           count = 0;
 
@@ -295,10 +315,17 @@
 
         video.listen( type, function( event ) {
 
-          if ( ++count === total ) {
-            callback && callback.call( video, event )
-          }
+          event.active = self;
+          
+          if ( excludes.indexOf( type ) > -1 ) {
 
+            callback && callback.call( video, event );
+            
+          } else {
+            if ( ++count === total ) {
+              callback && callback.call( video, event )
+            }
+          }
         });
       });
     }

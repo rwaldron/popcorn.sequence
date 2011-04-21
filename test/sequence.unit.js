@@ -1,19 +1,64 @@
-/*
 var localMediaList = [
-      "assets/snowdriving.ogv",
-      "assets/eich.ogv",
-      "assets/crockford.ogv"
-    ], 
+      { 
+        src: "assets/snowdriving.ogv", 
+        in: 10,
+        out: 13
+      }, 
+      {
+        src: "assets/eich.ogv",
+        in: 8, 
+        out: 11
+      }
+    ],  
     remoteMediaList = [
-      "http://ia600208.us.archive.org/5/items/Brunette_2/Brunette_2.ogv", 
-      "http://ia600208.us.archive.org/0/items/Blonde_2/Blonde_2.ogv"
-    ],
-    mixedMediaList = [
-      "assets/snowdriving.ogv",
-      "http://ia600208.us.archive.org/5/items/Brunette_2/Brunette_2.ogv", 
-      "assets/eich.ogv",
-      "http://ia600208.us.archive.org/0/items/Blonde_2/Blonde_2.ogv"
+      {
+        src: "http://ia600208.us.archive.org/5/items/Brunette_2/Brunette_2_512kb.mp4", 
+        in: 3,
+        out: 6
+      },
+      {
+        src: "http://ia600208.us.archive.org/0/items/Blonde_2/Blonde_2_512kb.mp4", 
+        in: 6,
+        out: 9
+      }
+    ], 
+    mixedSourceList = [
+      {
+        src: "http://ia600102.us.archive.org/23/items/HotNumber/HotNumber_512kb.mp4", 
+        in: 0, 
+        out: 5
+      },
+      {
+        src: "http://ia600102.us.archive.org/23/items/HotNumber/HotNumber_512kb.mp4", 
+        in: 10, 
+        out: 14
+      },
+      {
+        src: "http://ia600208.us.archive.org/5/items/Brunette_2/Brunette_2_512kb.mp4", 
+        in: 7,
+        out: 10
+      }, 
+      {
+        src: "assets/snowdriving.ogv",
+        in: 3,
+        out: 6
+      }, 
+      {
+        src: "http://ia600208.us.archive.org/0/items/Blonde_2/Blonde_2_512kb.mp4",
+        in: 20,
+        out: 22
+      },      
+      {
+        src: "http://ia600400.us.archive.org/8/items/TripDownMarketStreetrBeforeTheFire/TripDownMktStreet_clean_512kb.mp4",
+        in: 2,
+        out: 6
+      }
     ];
+
+
+
+//$seq = Popcorn.sequence( "seq-fixture", clips );
+//$seq.play();
 
 module("API");
 test("Popcorn.sequence", function() {
@@ -26,33 +71,107 @@ test("Popcorn.sequence", function() {
   
 });
 
-
 test("sequence( media, array )", function() {
   
-  expect( 13 );
+  expect( 21 );
   
   
   var seq = Popcorn.sequence( "video-sequence-a", localMediaList );
-  
 
+  window.seq = seq;  
+
+  // int
+  ok( seq.hasOwnProperty( "active" ), 'seq.hasOwnProperty( "active" )' );
+
+  // array
+  ok( seq.hasOwnProperty( "clips" ), 'seq.hasOwnProperty( "clips" )' );
+
+  // bool
+  ok( seq.hasOwnProperty( "cycling" ), 'seq.hasOwnProperty( "cycling" )' );    
+
+  // object
   ok( seq.hasOwnProperty( "dims" ), 'seq.hasOwnProperty( "dims" )' );
-  ok( seq.hasOwnProperty( "parent" ), 'seq.hasOwnProperty( "parent" )' );
-  ok( seq.hasOwnProperty( "seqId" ), 'seq.hasOwnProperty( "seqId" )' );
+
+  // node
+  ok( seq.hasOwnProperty( "place" ), 'seq.hasOwnProperty( "place" )' );
+
+  // bool
+  ok( seq.hasOwnProperty( "playing" ), 'seq.hasOwnProperty( "playing" )' );
+
+  // array
   ok( seq.hasOwnProperty( "playlist" ), 'seq.hasOwnProperty( "playlist" )' );
-  ok( seq.hasOwnProperty( "video" ), 'seq.hasOwnProperty( "video" )' );  
+
+  // string  
+  ok( seq.hasOwnProperty( "seqId" ), 'seq.hasOwnProperty( "seqId" )' );
+
+  // node list
+  ok( seq.hasOwnProperty( "queue" ), 'seq.hasOwnProperty( "queue" )' );
+
+
+  // int
+  equal( typeof seq.active, "number", 'seq.active typeof ');
+
+  // array
+  equal( typeof seq.clips, "object", 'seq.clips typeof ');
+
+  // bool
+  equal( typeof seq.cycling, "boolean", 'seq.cycling typeof ');    
+
+  // object
+  equal( typeof seq.dims, "object", 'seq.dims typeof ');
+
+  // node
+  equal( typeof seq.place, "object", 'seq.place typeof ');
+
+  // bool
+  equal( typeof seq.playing, "boolean", 'seq.playing typeof ');
+
+  // array
+  equal( typeof seq.playlist, "object", 'seq.playlist typeof ');
+
+  // string  
+  equal( typeof seq.seqId, "string", 'seq.seqId typeof ');
+
+  // node list
+  equal( typeof seq.queue, "object", 'seq.queue typeof ');
+
+
+  equal( seq.queue.length, localMediaList.length, 'Popcorn.sequence( video-sequence-a, localMediaList).queue.length returns localMediaList.length' );
   
+  equal( seq.playlist.length, localMediaList.length, 'Popcorn.sequence( video-sequence-a, localMediaList).playlist.length returns localMediaList.length' );
+
+  equal( seq.clips.length, localMediaList.length, 'Popcorn.sequence( video-sequence-a, localMediaList).clips.length returns localMediaList.length' );
+
+});
+
+test("Popcorn.sequence.prototype", function() {
   
-  equal( typeof seq.dims, "object", 'typeof seq.dims, "object"' );
-  equal( typeof seq.eq, "function", 'typeof seq.eq, "function"' );
+  var expects = 4, 
+      seq = Popcorn.sequence( "video-sequence-a", localMediaList ), 
+      fns = Object.getOwnPropertyNames( Popcorn.sequence.prototype );
+
+
+  expects += (fns.length - 1) * 2;
+
+  expect( expects );
+  
+  console.log( seq );
+  //  PROTOTYPE FNS
+
+  fns.forEach(function( prop, idx ) {
+    if ( prop !== "constructor" ) {
+      ok( seq.__proto__[ prop ], "seq.__proto__[ " + prop + " ]" );
+      equal( typeof seq.__proto__[ prop ], "function", "seq.__proto__[ " + prop + " ] is function" );
+    }
+  });
+
   //  TODO write typeof tests for all the own props
-  
   
   ok( seq.eq( 1 ) instanceof Popcorn, "seq.eq( 1 ) instanceof Popcorn" );
   
   
-  same( seq.queue.length, localMediaList.length, 'Popcorn.sequence( video-sequence-b, localMediaList).queue.length returns localMediaList.length' );
-  
-  same( seq.playlist.length, localMediaList.length, 'Popcorn.sequence( video-sequence-b, localMediaList).playlist.length returns localMediaList.length' );
+
+
   
   seq.playlist.forEach( function( item ) {
     
@@ -60,9 +179,6 @@ test("sequence( media, array )", function() {
   
   });
 });
-
-
-
 
 module("Elements");
 test("local media", function() {
@@ -83,7 +199,7 @@ test("local media", function() {
   
   var seq = Popcorn.sequence( "video-sequence-a", localMediaList ),
       $videos = document.getElementById("qunit-fixture").querySelectorAll("video");
-  
+
   equals( $videos.length, localMediaList.length, localMediaList.length + " Videos in the sequence" );
   plus();
 
@@ -111,6 +227,7 @@ test("remote media", function() {
   plus();
 
 });
+
 
 
 module("Access");
@@ -164,7 +281,6 @@ test("remote media", function() {
     
   });
 });
-
 module("Events");
 test("local media", function () {
 
@@ -204,7 +320,7 @@ test("local media", function () {
 test("remote media", function () {
 
 
-  var expects = 1, 
+  var expects = 2, 
       count = 0;
 
   expect(expects);
@@ -226,6 +342,14 @@ test("remote media", function () {
     
   });
 
+  seq.listen( "canplaythrough", function( event ) {
+  
+    ok( true, "`canplaythrough` fired for all in sequence" );
+
+    plus();
+    
+  });  
+
 });
 
 
@@ -244,7 +368,7 @@ test("Normalized Dimensions", function () {
     }
   }  
   
-  stop(2000);
+  stop(10000);
   
   var seq = Popcorn.sequence( "video-sequence-b", localMediaList ), 
       dims = {
@@ -254,6 +378,8 @@ test("Normalized Dimensions", function () {
   
   seq.listen( "loadedmetadata", function( event ) {
 
+    //console.log( "loaded" );
+    console.log( seq );
     seq.playlist.forEach( function( $p, idx ) {
       
       if ( !dims.width ) {
@@ -272,4 +398,59 @@ test("Normalized Dimensions", function () {
   });
   
 });
-*/
+
+module("Playback");
+test("Reference Tests", function () {
+  
+  var expects = 13, 
+      count = 0;
+
+  expect(expects);
+  
+  function plus() { 
+    if ( ++count === expects ) {
+      start(); 
+    }
+  }  
+  
+  stop(60000);
+
+
+  var seq = Popcorn.sequence( "video-sequence-b", mixedSourceList ), 
+      dims = {
+        width: 0, 
+        height: 0
+      };
+
+  [ 4, 7, 11, 15, 19, 22 ].forEach(function( time, idx ) {
+
+    seq.exec( time, function() {
+      //console.log( seq.active, time );
+      equal( seq.active, idx, "video " + idx + " is active" );
+      plus();
+
+			// currentSrc will force resources to have abs url, thus making local resources unmatchable
+      ok( seq.queue[ idx ].currentSrc.indexOf(mixedSourceList[ idx ].src) > -1, "seq.queue[ idx ].currentSrc same as mixedSourceList[ idx ].src" );
+      plus();
+    });
+  });
+
+  seq.playlist.forEach(function( pop ) {
+    //console.log( pop.data.trackEvents.byStart );
+  });
+  
+  seq.listen( "loadedmetadata", function( event ) {
+
+    equal( event.type, "loadedmetadata", "Artificial bubbling occurred" );
+    
+    seq.listen("timeupdate", function( event ) {
+      //console.log( "timeupdate", this, event );
+      //console.log( "timeupdate", this );
+    });
+
+    seq.play();
+  });
+  
+});
+
+
