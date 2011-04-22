@@ -8,10 +8,10 @@ COMPILER = ${JS_ENGINE} ${BUILD_DIR}/uglify.js --unsafe
 POST_COMPILER = ${JS_ENGINE} ${BUILD_DIR}/post-compile.js
 
 
-lint:
+hint:
 	@@if test ! -z ${JS_ENGINE}; then \
-		echo "Linting Popcorn.sequence"; \
-		${JS_ENGINE} build/jslint-check.js; \
+		echo "Hinting Popcorn.sequence"; \
+		${JS_ENGINE} build/jshint-check.js; \
 	else \
 		echo "Nodejs is missing"; \
 	fi
