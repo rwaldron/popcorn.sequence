@@ -1,8 +1,16 @@
+/*!
+ * Popcorn.sequence
+ *
+ * Copyright 2011, Rick Waldron
+ * Licensed under MIT license.
+ *
+ */
+
+
 //  Requires Popcorn.js
 (function( global, Popcorn ) {
 
   //  TODO: as support increases, migrate to element.dataset 
-  
   var doc = global.document, 
       rprotocol = /:\/\//, 
       //  TODO: better solution to this sucky stop-gap
@@ -11,7 +19,7 @@
   Popcorn.sequence = function( place, list ) {
     return new Popcorn.sequence.init( place, list );
   };
- 
+
   Popcorn.sequence.init = function( place, list ) {
     
     //  Video element
@@ -50,7 +58,7 @@
 
     //  Create `video` elements
     Popcorn.forEach( list, function( media, idx ) {
-      
+
       var video = doc.createElement( "video" );
 
 
@@ -195,7 +203,7 @@
     if ( !queue[ idx + 1 ] ) {
       nextIdx = 0;
     }
-
+	
     next = queue[ nextIdx ];
     clip = clips[ nextIdx ];
 
@@ -324,10 +332,10 @@
           if ( excludes.indexOf( type ) > -1 ) {
 
             callback && callback.call( video, event );
-            
+
           } else {
             if ( ++count === total ) {
-              callback && callback.call( video, event )
+              callback && callback.call( video, event );
             }
           }
         });
@@ -335,5 +343,4 @@
     }
   });
 
-  
 })( this, Popcorn );

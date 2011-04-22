@@ -440,7 +440,8 @@ test("Reference Tests", function () {
   seq.listen( "loadedmetadata", function( event ) {
 
     equal( event.type, "loadedmetadata", "Artificial bubbling occurred" );
-
+		plus();
+		
     //window.seq = seq;
 
     seq.play();
