@@ -46,7 +46,7 @@
     };
 
     var self = this, 
-        clipOffset;
+        clipOffset = 0;
 
     //  Create `video` elements
     Popcorn.forEach( list, function( media, idx ) {
@@ -68,8 +68,8 @@
 
       //  Push the in/out points into sequence clips
       self.clips.push({ 
-        in: ( "in" in media ) && media.in || 1,
-        out: ( "out" in media ) && media.out || 0,  
+        "in": ( "in" in media ) && media.in || 1,
+        "out": ( "out" in media ) && media.out || 0
       });
 
       self.clips[ idx ].out = self.clips[ idx ].out || self.clips[ idx ].in + 2;
@@ -91,14 +91,12 @@
 
     });
 
-    var clipOffset = 0;
-
     self.clips.forEach(function( obj ) {
 
       var clipDuration = obj.out - obj.in, 
           offs = {
-            in: clipOffset,
-            out: clipOffset + clipDuration
+            "in": clipOffset,
+            "out": clipOffset + clipDuration
           };
 
       self.offs.push( offs );
@@ -125,7 +123,7 @@
               self.dims.height = media.videoHeight;
             }
             
-            media.currentTime = self.clips[ idx ].in - .5;
+            media.currentTime = self.clips[ idx ].in - 0.5;
 
             media.removeEventListener( "canplaythrough", canPlayThrough, false );
           };
@@ -176,11 +174,17 @@
 
     ////console.log( seq, idx );
 
-    var queue = this.queue, 
-        clips = this.clips, 
-        current = queue[ idx ], 
-        nextIdx = 0, 
-        next, clip, $pop;
+    var //  Localized array references
+    queue = this.queue, 
+    clips = this.clips, 
+    current = queue[ idx ], 
+    nextIdx = 0, 
+    next, clip, $pop;
+
+    
+    var //  Popcorn instances
+    $popnext, 
+    $popprev;
 
 
     if ( queue[ idx + 1 ] ) {
