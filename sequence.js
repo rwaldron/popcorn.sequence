@@ -61,12 +61,14 @@
 
       var video = doc.createElement( "video" );
 
+      //  Preload the video
+      video.preload = "auto";
 
       //  Setup newly created video element
       video.controls = true;
 
       //  If the first, show it, if the after, hide it
-      video.style.display = ( idx && "none" ) || "" ;
+      video.style.display = ( idx && "none" ) || "inline" ;
 
       //  Seta registered sequence id
       video.id = self.seqId + "-" + idx ;
@@ -181,62 +183,65 @@
     nextIdx = 0, 
     next, clip, $pop;
 
-    
     var //  Popcorn instances
     $popnext, 
     $popprev;
 
+    //Reset queue
+    //if ( !queue[ idx + 1 ] ) {
+      //nextIdx = 0;
+    //}
+	  if ( queue[ idx + 1 ] ) {
 
-    if ( queue[ idx + 1 ] ) {
       nextIdx = idx + 1;
+    
+      next = queue[ nextIdx ];
+      clip = clips[ nextIdx ];
+
+      //  Constrain dimentions
+      Popcorn.extend( next, {
+        width: this.dims.width, 
+        height: this.dims.height
+      });
+
+      $popnext = this.playlist[ nextIdx ];
+      $popprev = this.playlist[ idx ];
+
+      //  When not resetting to 0
+      current.pause();
+
+      this.active = nextIdx;
+      this.times.last = clip.in - 1;
+
+      //  Play the next video in the sequence
+      $popnext.currentTime( clip.in );
+
+      //$popnext[ nextIdx ? "play" : "pause" ]();
+      $popnext.play();
+
+      //  Set the previous back to it's beginning time
+      $popprev.currentTime( clips[ idx ].in );
+
+      if ( nextIdx ) {
+        //  Hide the currently ending video
+        current.style.display = "none";
+        //  Show the next video in the sequence    
+        next.style.display = "inline";    
+      }
+
+      this.cycling = false;
+
+      //  When reseting to first video
+      if ( !nextIdx ) {
+        //  Reset currentTime to 0
+        //next.currentTime = clip.in;
+      }
+
+    } else {
+
+      this.playlist[idx].pause();
+
     }
-
-    //  Reset queue
-    if ( !queue[ idx + 1 ] ) {
-      nextIdx = 0;
-    }
-	
-    next = queue[ nextIdx ];
-    clip = clips[ nextIdx ];
-
-    //  Constrain dimentions
-    Popcorn.extend( next, {
-      width: this.dims.width, 
-      height: this.dims.height
-    });
-
-    $popnext = this.playlist[ nextIdx ];
-    $popprev = this.playlist[ idx ];
-
-    //  When not resetting to 0
-    current.pause();
-
-    this.active = nextIdx;
-    this.times.last = clip.in - 1;
-
-    //  Play the next video in the sequence
-    $popnext.currentTime( clip.in );
-
-    $popnext[ nextIdx ? "play" : "pause" ]();
-
-    //  Set the previous back to it's beginning time
-    $popprev.currentTime( clips[ idx ].in );
-
-    if ( nextIdx ) {
-      //  Hide the currently ending video
-      current.style.display = "none";
-      //  Show the next video in the sequence    
-      next.style.display = "";    
-    }
-
-    this.cycling = false;
-
-    //  When reseting to first video
-    if ( !nextIdx ) {
-      //  Reset currentTime to 0
-      //next.currentTime = clip.in;
-    }
-  
   };
 
   var excludes = [ "timeupdate", "play", "pause" ];
