@@ -54,20 +54,13 @@
     };
 
     var self = this, 
-        clipOffset = 0, 
-        clone;
+        clipOffset = 0;
 
     //  Create `video` elements
     Popcorn.forEach( list, function( media, idx ) {
 
-      var src = !rprotocol.test( media.src ) ? lochref + media.src : media.src, 
-          video;
+      var video = doc.createElement( "video" );
 
-      if ( clone && clone.src === src ) {
-        video = clone.cloneNode();
-      } else {
-        video = clone = doc.createElement( "video" );
-      }
 
       //  Setup newly created video element
       video.controls = true;
@@ -90,7 +83,7 @@
       self.clips[ idx ].out = self.clips[ idx ].out || self.clips[ idx ].in + 2;
       
       //  Set the sources
-      video.src = src;
+      video.src = !rprotocol.test( media.src ) ? lochref + media.src : media.src;
 
       //  Set some squence specific data vars
       video.setAttribute("data-sequence-owner", place );
@@ -210,7 +203,7 @@
     if ( !queue[ idx + 1 ] ) {
       nextIdx = 0;
     }
-  
+	
     next = queue[ nextIdx ];
     clip = clips[ nextIdx ];
 
