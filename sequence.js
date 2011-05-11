@@ -204,6 +204,20 @@
         height: this.dims.height
       });
 
+    //  Reset queue
+    if ( !queue[ idx + 1 ] ) {
+      nextIdx = 0;
+    }
+  
+    next = queue[ nextIdx ];
+    clip = clips[ nextIdx ];
+
+    //  Constrain dimentions
+    Popcorn.extend( next, {
+      width: this.dims.width, 
+      height: this.dims.height
+    });
+
       $popnext = this.playlist[ nextIdx ];
       $popprev = this.playlist[ idx ];
 
