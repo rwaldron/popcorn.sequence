@@ -61,6 +61,7 @@
 
       var video = doc.createElement( "video" );
 
+      video.preload = "auto";
 
       //  Setup newly created video element
       video.controls = true;
@@ -195,7 +196,7 @@
     if ( !queue[ idx + 1 ] ) {
       nextIdx = 0;
     }
-	
+  
     next = queue[ nextIdx ];
     clip = clips[ nextIdx ];
 
