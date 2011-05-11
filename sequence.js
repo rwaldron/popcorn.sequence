@@ -115,31 +115,23 @@
     Popcorn.forEach( this.queue, function( media, idx ) {
 
       var //  Context sensitive callbacks
-          canPlayThrough = function( event ) {
+      canPlayThrough = function( event ) {
 
-            var target = event.srcElement || event.target;
-            
-            media.play();
+        var target = event.srcElement || event.target;
 
-            setTimeout(function() {
-              media.pause();
-            }, 100);
+        //  If this is idx zero, use it as dimension for all
+        if ( !idx ) {
+          self.dims.width = media.videoWidth;
+          self.dims.height = media.videoHeight;
+        }
+        
+        media.currentTime = self.clips[ idx ].in - 0.5;
 
-            //  If this is idx zero, use it as dimension for all
-            if ( !idx ) {
-              self.dims.width = media.videoWidth;
-              self.dims.height = media.videoHeight;
-            }
-            
-            media.currentTime = self.clips[ idx ].in - 0.5;
-
-            media.removeEventListener( "canplaythrough", canPlayThrough, false );
-          };
-
+        media.removeEventListener( "canplaythrough", canPlayThrough, false );
+      };
 
       //  Hook up event listeners for managing special playback 
       media.addEventListener( "canplaythrough", canPlayThrough, false );
-
 
       //  TODO: consolidate & DRY
       media.addEventListener( "play", function( event ) {
