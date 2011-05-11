@@ -229,13 +229,13 @@
         next.style.display = "inline";    
       }
 
-      this.cycling = false;
+      //this.cycling = false;
 
       //  When reseting to first video
-      if ( !nextIdx ) {
+      //if ( !nextIdx ) {
         //  Reset currentTime to 0
         //next.currentTime = clip.in;
-      }
+      //}
 
     } else {
 
