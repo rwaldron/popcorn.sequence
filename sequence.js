@@ -334,7 +334,22 @@
           }
         });
       });
+
+      // Return the sequence object to allow chaining methods
+      return this;
     }
   });
 
+
+  Popcorn.forEach( Popcorn.manifest, function( obj, plugin ) {
+
+    Popcorn.sequence.prototype[ plugin ] = function( options ) {
+
+      console.log( this );
+
+      // Return the sequence object to allow chaining methods
+      return this;
+    };
+    
+  });
 })( this, Popcorn );

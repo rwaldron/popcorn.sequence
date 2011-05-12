@@ -450,3 +450,94 @@ test("Reference Tests", function () {
 });
 
 
+module("Plugin Support");
+test("Implementation", function() {
+
+	expect( Popcorn.registry.length );
+
+	Popcorn.forEach( Popcorn.manifest, function( obj, plugin ) {
+		ok( plugin in Popcorn.sequence.prototype, "Plugin: '"+plugin+"' exists in Popcorn.sequence.prototype" );		
+	});	
+});
+
+test("Functional", function () {
+  
+  var expects = 1, 
+      count = 0;
+
+  expect(expects);
+  
+  function plus() { 
+    if ( ++count === expects ) {
+      start(); 
+    }
+  }
+
+  stop(35000);
+
+
+  var seq = Popcorn.sequence( "video-sequence-b", mixedSourceList ),
+      dims = {
+        width: 0,
+        height: 0
+      };
+
+
+
+
+  seq.listen( "canplaythrough", function( event ) {
+
+		console.log( seq, seq.duration() );  
+
+		seq.footnote({
+			start: 0.5, 
+			end: seq.duration(),
+			text: "this footnote persists for entire sequence",
+			target: "footnote-container"
+		}).footnote({
+			start: 1, 
+			end: seq.duration() - 2,
+			text: "this footnote appears at :01 and dissappears 2 seconds before the end of the sequence",
+			target: "footnote-container"
+		});		
+    
+  }); 
+
+  
+
+
+
+	ok(true, "ref");
+	plus();
+/*
+  //[ 4, 7, 11, 15, 19, 22 ]
+  [ 1, 4, 7, 10, 13 ].forEach(function( time, idx ) {
+
+    seq.exec( time, function() {
+      //console.log( seq.active, time );
+      equal( seq.active, idx, "video " + idx + " is active" );
+      plus();
+
+      // currentSrc will force resources to have abs url, thus making local resources unmatchable
+      ok( seq.queue[ idx ].currentSrc.indexOf(mixedSourceList[ idx ].src) > -1, "seq.queue[ idx ].currentSrc same as mixedSourceList[ idx ].src" );
+      plus();
+    });
+  });
+
+  seq.playlist.forEach(function( pop ) {
+    //console.log( pop.data.trackEvents.byStart );
+  });
+  
+  seq.listen( "loadedmetadata", function( event ) {
+
+    equal( event.type, "loadedmetadata", "Artificial bubbling occurred" );
+		plus();
+		
+    //window.seq = seq;
+
+    seq.play();
+  });
+*/  
+});
+
+
