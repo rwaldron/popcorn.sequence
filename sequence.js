@@ -68,7 +68,7 @@
       video.controls = true;
 
       //  If the first, show it, if the after, hide it
-      video.style.display = ( idx && "none" ) || "inline" ;
+      video.style.display = ( idx && "none" ) || "" ;
 
       //  Seta registered sequence id
       video.id = self.seqId + "-" + idx ;
@@ -240,7 +240,7 @@
         //  Hide the currently ending video
         current.style.display = "none";
         //  Show the next video in the sequence    
-        next.style.display = "inline";    
+        next.style.display = "";    
       }
 
       //this.cycling = false;
