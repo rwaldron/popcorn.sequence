@@ -14,7 +14,26 @@
   var doc = global.document, 
       rprotocol = /:\/\//, 
       //  TODO: better solution to this sucky stop-gap
-      lochref = location.href.replace( location.href.split("/").slice(-1)[0], "" );
+      lochref = location.href.replace( location.href.split("/").slice(-1)[0], "" ), 
+      // privately held
+      range = function(start, stop, step) {
+
+        start = start || 0;
+        stop = ( stop || start || 0 ) + 1;
+        step = step || 1;
+            
+        var len = Math.ceil((stop - start) / step) || 0,
+            idx = 0,
+            range = [];
+
+        range.length = len;
+
+        while (idx < len) {
+         range[idx++] = start;
+         start += step;
+        }
+        return range;
+      };
 
   Popcorn.sequence = function( place, list ) {
     return new Popcorn.sequence.init( place, list );
@@ -255,16 +274,16 @@
       return this.clips[ idx ];
     },
     //  Returns sum duration for all videos in sequence
-    duration: function( clips ) {
+    duration: function() {
 
       var ret = 0, 
-          seq = this.playlist;
-      
+          seq = this.offs;
+
       for ( var i = 0; i < seq.length; i++ ) {
-        ret += this.clips[ i ].out - this.clips[ i ].in;
+        ret += seq[ i ].out - seq[ i ].in + 1;
       }
 
-      return ret;
+      return ret - 1;
     },
 
     play: function() {
@@ -339,9 +358,95 @@
 
   Popcorn.forEach( Popcorn.manifest, function( obj, plugin ) {
 
+    // Implement passthrough methods to plugins
     Popcorn.sequence.prototype[ plugin ] = function( options ) {
 
-      console.log( this );
+      // console.log( this, options );
+      var videos = {}, assignTo = [], 
+      idx, off, inOuts, inIdx, outIdx, keys, clip, clipInOut, clipRange;
+
+      for ( idx = 0; idx < this.offs.length; idx++  ) {
+        // store reference 
+        off = this.offs[ idx ];
+        // array to test against
+        inOuts = range( off.in, off.out );
+
+        inIdx = inOuts.indexOf( options.start );
+        outIdx = inOuts.indexOf( options.end );
+
+        if ( inIdx > -1 ) {
+          videos[ idx ] = Popcorn.extend( {}, off, {
+            start: inOuts[ inIdx ],
+            clipIdx: inIdx
+          });
+        }
+
+        if ( outIdx > -1 ) {
+          videos[ idx ] = Popcorn.extend( {}, off, {
+            end: inOuts[ outIdx ], 
+            clipIdx: outIdx
+          });
+        }
+      }
+
+      keys = Object.keys( videos ).map(function( val ) {
+                return +val;
+              });
+
+      assignTo = range( keys[ 0 ], keys[ 1 ] );
+
+      console.log( "PLUGIN CALL MAPS: ", videos, keys, assignTo );
+
+
+      for ( idx = 0; idx < assignTo.length; idx++ ) {
+
+        var compile = {},
+        play = assignTo[ idx ], 
+        vClip = videos[ play ];
+
+        //console.log( play );
+        if ( vClip ) {
+          // has instructions
+
+          clip = this.clips[ play ];
+          clipInOut = vClip.clipIdx;
+          clipRange = range( clip.in, clip.out );
+
+          if ( "start" in vClip ) {
+            console.log( clipInOut );
+            compile.start = clipRange[ clipInOut ];
+            compile.end = clipRange[ clipRange.length - 1 ];
+          }
+
+          if ( "end" in vClip ) {
+            compile.start = clipRange[ 0 ];
+            compile.end = clipRange[ clipInOut ];
+          }
+
+          //console.log( play, "has in OR out: videos, ", vClip, [ "clip", clip, clipRange[ clipInOut ] ] );
+          //console.log( "bookend", compile );
+          
+        } else {
+
+          compile.start = this.clips[ play ].in;
+          compile.end = this.clips[ play ].out;
+
+          //console.log( "midplay", this.clips[ play ], compile );
+        }
+
+        if ( compile.start === compile.end ) {
+          //compile.start -= 0.1;
+          //compile.end += 0.9;
+        }
+
+        //console.log( play, compile, Popcorn.extend( {}, options, compile ) );
+
+        this.playlist[ idx ][ plugin ]( 
+          // Merge the original options object with the compiled start/end object 
+          Popcorn.extend( {}, options, compile )
+        );
+        
+      }
 
       // Return the sequence object to allow chaining methods
       return this;

@@ -18,12 +18,12 @@ var useOgv = document.createElement("video").canPlayType("video/ogg") === "maybe
     ],  
     remoteMediaList = [
       {
-        src: "http://ia600208.us.archive.org/5/items/Brunette_2/Brunette_2" + useType,  
+        src: "http://ia700208.us.archive.org/5/items/Brunette_2/Brunette_2" + useType,  
         in: 3,
         out: 6
       },
       {
-        src: "http://ia600208.us.archive.org/0/items/Blonde_2/Blonde_2" + useType,  
+        src: "http://ia700208.us.archive.org/0/items/Blonde_2/Blonde_2" + useType,  
         in: 6,
         out: 9
       }
@@ -40,7 +40,7 @@ var useOgv = document.createElement("video").canPlayType("video/ogg") === "maybe
         out: 7
       },
       {
-        src: "http://ia600208.us.archive.org/5/items/Brunette_2/Brunette_2" + useType,  
+        src: "http://ia700208.us.archive.org/5/items/Brunette_2/Brunette_2" + useType,  
         in: 8,
         out: 10
       }, 
@@ -50,7 +50,7 @@ var useOgv = document.createElement("video").canPlayType("video/ogg") === "maybe
         out: 13
       }, 
       {
-        src: "http://ia600208.us.archive.org/0/items/Blonde_2/Blonde_2" + useType, 
+        src: "http://ia700208.us.archive.org/0/items/Blonde_2/Blonde_2" + useType, 
         in: 14,
         out: 16
       }
@@ -276,7 +276,7 @@ test("remote media", function() {
   });
 });
 
-console.log(useOgv  );
+
 if ( !useOgv ) {
 
   module("Events");
@@ -376,8 +376,6 @@ test("Normalized Dimensions", function () {
   
   seq.listen( "loadedmetadata", function( event ) {
 
-    //console.log( "loaded" );
-    //console.log( seq );
     seq.playlist.forEach( function( $p, idx ) {
       
       if ( !dims.width ) {
@@ -440,8 +438,8 @@ test("Reference Tests", function () {
   seq.listen( "loadedmetadata", function( event ) {
 
     equal( event.type, "loadedmetadata", "Artificial bubbling occurred" );
-		plus();
-		
+    plus();
+    
     //window.seq = seq;
 
     seq.play();
@@ -453,11 +451,11 @@ test("Reference Tests", function () {
 module("Plugin Support");
 test("Implementation", function() {
 
-	expect( Popcorn.registry.length );
+  expect( Popcorn.registry.length );
 
-	Popcorn.forEach( Popcorn.manifest, function( obj, plugin ) {
-		ok( plugin in Popcorn.sequence.prototype, "Plugin: '"+plugin+"' exists in Popcorn.sequence.prototype" );		
-	});	
+  Popcorn.forEach( Popcorn.manifest, function( obj, plugin ) {
+    ok( plugin in Popcorn.sequence.prototype, "Plugin: '"+plugin+"' exists in Popcorn.sequence.prototype" );    
+  });  
 });
 
 test("Functional", function () {
@@ -475,7 +473,7 @@ test("Functional", function () {
 
   stop(35000);
 
-
+ 
   var seq = Popcorn.sequence( "video-sequence-b", mixedSourceList ),
       dims = {
         width: 0,
@@ -483,61 +481,48 @@ test("Functional", function () {
       };
 
 
-
-
   seq.listen( "canplaythrough", function( event ) {
 
-		console.log( seq, seq.duration() );  
+    equal( seq.duration(), 13, "This sequence is 13 seconds long" );
+    plus();
 
-		seq.footnote({
-			start: 0.5, 
-			end: seq.duration(),
-			text: "this footnote persists for entire sequence",
-			target: "footnote-container"
-		}).footnote({
-			start: 1, 
-			end: seq.duration() - 2,
-			text: "this footnote appears at :01 and dissappears 2 seconds before the end of the sequence",
-			target: "footnote-container"
-		});		
+    console.log( seq, seq.duration() );
     
+    seq
+    .footnote({
+      start: 1, 
+      end: seq.duration(),
+      text: "this footnote starts at 1s and persists for entire sequence<br>",
+      target: "footnote-container"
+    })
+    .footnote({
+      start: 1, 
+      end: seq.duration() - 2,
+      text: "this footnote appears at :01 and dissappears 2 seconds before the end of the sequence<br>",
+      target: "footnote-container"
+    })
+    .footnote({
+      start: 5, 
+      end: 7,
+      text: "this footnote appears at 5s and dissappears at 7s; spanning 1 clip<br>",
+      target: "footnote-container"
+    })
+    .footnote({
+      start: 3, 
+      end: 6,
+      text: "this footnote appears at 3s and dissappears at 6s; Spanning 2 clips<br>",
+      target: "footnote-container"
+    })
+    .footnote({
+      start: 3, 
+      end: 9,
+      text: "this footnote appears at 3s and dissappears at 9s; Spanning 3 clips<br>",
+      target: "footnote-container"
+    });
+
+		seq.play();
   }); 
 
-  
-
-
-
-	ok(true, "ref");
-	plus();
-/*
-  //[ 4, 7, 11, 15, 19, 22 ]
-  [ 1, 4, 7, 10, 13 ].forEach(function( time, idx ) {
-
-    seq.exec( time, function() {
-      //console.log( seq.active, time );
-      equal( seq.active, idx, "video " + idx + " is active" );
-      plus();
-
-      // currentSrc will force resources to have abs url, thus making local resources unmatchable
-      ok( seq.queue[ idx ].currentSrc.indexOf(mixedSourceList[ idx ].src) > -1, "seq.queue[ idx ].currentSrc same as mixedSourceList[ idx ].src" );
-      plus();
-    });
-  });
-
-  seq.playlist.forEach(function( pop ) {
-    //console.log( pop.data.trackEvents.byStart );
-  });
-  
-  seq.listen( "loadedmetadata", function( event ) {
-
-    equal( event.type, "loadedmetadata", "Artificial bubbling occurred" );
-		plus();
-		
-    //window.seq = seq;
-
-    seq.play();
-  });
-*/  
 });
 
 
