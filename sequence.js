@@ -256,16 +256,12 @@
     },
     //  Returns sum duration for all videos in sequence
     duration: function( clips ) {
-      
+
       var ret = 0, 
           seq = this.playlist;
       
       for ( var i = 0; i < seq.length; i++ ) {
-        if ( !clips ) {
-          ret += seq[ i ].video.duration;
-        } else {
-          ret += this.clips[ i ].out - this.clips[ i ].in;
-        }
+        ret += this.clips[ i ].out - this.clips[ i ].in;
       }
 
       return ret;
