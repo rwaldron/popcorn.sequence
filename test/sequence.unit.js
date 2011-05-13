@@ -449,4 +449,43 @@ test("Reference Tests", function () {
   
 });
 
+module("Playback");
+test("Finished Sequence Tests", function () {
+  
+  var expects = 2, 
+      count = 0;
+
+  expect(expects);
+
+  function plus() { 
+    if ( ++count === expects ) {
+      start(); 
+    }
+  }
+
+  stop(360000);
+
+
+  var seq2 = Popcorn.sequence( "video-sequence-a", remoteMediaList ),
+      dims = {
+        width: 0,
+        height: 0
+      };
+
+  seq2.listen( "pause", function() {
+ 
+    if ( seq2.active === seq2.playlist.length - 1 && seq2.playlist[seq2.active].media.currentTime >  seq2.clips[seq2.active].in ) {
+      equal( Math.floor(seq2.playlist[ seq2.active ].media.currentTime), seq2.clips[ seq2.active ].out, "The sequence had ended at the correct time" );
+      plus();
+      equal( seq2.active, seq2.playlist.length -1, "The last video clip is displayed" );
+      plus();
+    }
+  });
+  
+  seq2.listen( "loadedmetadata", function( event ) {
+
+    seq2.play();
+  });
+
+});
 
