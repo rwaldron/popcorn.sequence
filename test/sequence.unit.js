@@ -18,12 +18,12 @@ var useOgv = document.createElement("video").canPlayType("video/ogg") === "maybe
     ],  
     remoteMediaList = [
       {
-        src: "http://ia600208.us.archive.org/5/items/Brunette_2/Brunette_2" + useType,  
+        src: "http://ia700208.us.archive.org/5/items/Brunette_2/Brunette_2" + useType,  
         in: 3,
         out: 6
       },
       {
-        src: "http://ia600208.us.archive.org/0/items/Blonde_2/Blonde_2" + useType,  
+        src: "http://ia700208.us.archive.org/0/items/Blonde_2/Blonde_2" + useType,  
         in: 6,
         out: 9
       }
@@ -40,7 +40,7 @@ var useOgv = document.createElement("video").canPlayType("video/ogg") === "maybe
         out: 7
       },
       {
-        src: "http://ia600208.us.archive.org/5/items/Brunette_2/Brunette_2" + useType,  
+        src: "http://ia700208.us.archive.org/5/items/Brunette_2/Brunette_2" + useType,  
         in: 8,
         out: 10
       }, 
@@ -50,7 +50,7 @@ var useOgv = document.createElement("video").canPlayType("video/ogg") === "maybe
         out: 13
       }, 
       {
-        src: "http://ia600208.us.archive.org/0/items/Blonde_2/Blonde_2" + useType, 
+        src: "http://ia700208.us.archive.org/0/items/Blonde_2/Blonde_2" + useType, 
         in: 14,
         out: 16
       }
@@ -72,7 +72,7 @@ test("Popcorn.sequence", function() {
 
 test("sequence( media, array )", function() {
   
-  expect( 21 );
+  expect( 23 );
   
   
   var seq = Popcorn.sequence( "video-sequence-a", localMediaList );
@@ -82,8 +82,11 @@ test("sequence( media, array )", function() {
   // int
   ok( seq.hasOwnProperty( "active" ), 'seq.hasOwnProperty( "active" )' );
 
-  // array
-  ok( seq.hasOwnProperty( "clips" ), 'seq.hasOwnProperty( "clips" )' );
+  // object
+  ok( seq.hasOwnProperty( "inOuts" ), 'seq.hasOwnProperty( "inOuts" )' );
+
+  ok( seq.inOuts.hasOwnProperty( "ofVideos" ), 'seq.inOuts.hasOwnProperty( "ofVideos" )' );
+  ok( seq.inOuts.hasOwnProperty( "ofClips" ), 'seq.inOuts.hasOwnProperty( "ofClips" )' );
 
   // bool
   ok( seq.hasOwnProperty( "cycling" ), 'seq.hasOwnProperty( "cycling" )' );    
@@ -92,7 +95,7 @@ test("sequence( media, array )", function() {
   ok( seq.hasOwnProperty( "dims" ), 'seq.hasOwnProperty( "dims" )' );
 
   // node
-  ok( seq.hasOwnProperty( "place" ), 'seq.hasOwnProperty( "place" )' );
+  ok( seq.hasOwnProperty( "parent" ), 'seq.hasOwnProperty( "parent" )' );
 
   // bool
   ok( seq.hasOwnProperty( "playing" ), 'seq.hasOwnProperty( "playing" )' );
@@ -111,7 +114,7 @@ test("sequence( media, array )", function() {
   equal( typeof seq.active, "number", 'seq.active typeof ');
 
   // array
-  equal( typeof seq.clips, "object", 'seq.clips typeof ');
+  equal( typeof seq.inOuts, "object", 'seq.inOuts typeof ');
 
   // bool
   equal( typeof seq.cycling, "boolean", 'seq.cycling typeof ');    
@@ -120,7 +123,7 @@ test("sequence( media, array )", function() {
   equal( typeof seq.dims, "object", 'seq.dims typeof ');
 
   // node
-  equal( typeof seq.place, "object", 'seq.place typeof ');
+  equal( typeof seq.parent, "object", 'seq.parent typeof ');
 
   // bool
   equal( typeof seq.playing, "boolean", 'seq.playing typeof ');
@@ -139,7 +142,7 @@ test("sequence( media, array )", function() {
   
   equal( seq.playlist.length, localMediaList.length, 'Popcorn.sequence( video-sequence-a, localMediaList).playlist.length returns localMediaList.length' );
 
-  equal( seq.clips.length, localMediaList.length, 'Popcorn.sequence( video-sequence-a, localMediaList).clips.length returns localMediaList.length' );
+  equal( seq.inOuts.ofVideos.length, localMediaList.length, 'Popcorn.sequence( video-sequence-a, localMediaList).inOuts.ofVideos.length returns localMediaList.length' );
 
 });
 
@@ -172,6 +175,8 @@ test("Popcorn.sequence.prototype", function() {
     ok( item instanceof Popcorn, "item instanceof Popcorn" );
   
   });
+
+  seq.remove();
 });
 
 module("Elements");
@@ -185,6 +190,7 @@ test("local media", function() {
   function plus() { 
     if ( ++count === expects ) {
       start(); 
+      seq.remove();
     }
   }  
   
@@ -209,6 +215,7 @@ test("remote media", function() {
   function plus() { 
     if ( ++count === expects ) {
       start(); 
+      seq.remove();
     }
   }  
   
@@ -235,6 +242,7 @@ test("local media", function() {
   function plus() { 
     if ( ++count === expects ) {
       start(); 
+      seq.remove();
     }
   }  
   
@@ -261,6 +269,7 @@ test("remote media", function() {
   function plus() { 
     if ( ++count === expects ) {
       start(); 
+      seq.remove();
     }
   }  
   
@@ -276,7 +285,7 @@ test("remote media", function() {
   });
 });
 
-console.log(useOgv  );
+
 if ( !useOgv ) {
 
   module("Events");
@@ -291,6 +300,7 @@ if ( !useOgv ) {
     function plus() { 
       if ( ++count === expects ) {
         start(); 
+        seq.remove();
       }
     }  
     
@@ -326,6 +336,7 @@ if ( !useOgv ) {
     function plus() { 
       if ( ++count === expects ) {
         start(); 
+        seq.remove();
       }
     }  
     
@@ -350,6 +361,28 @@ if ( !useOgv ) {
 
   });
 
+//  test("trigger(native)", function () {
+//  
+//    var expects = 1;
+
+//    expect(expects);
+//    
+//    var seq = Popcorn.sequence( "video-sequence-b", mixedSourceList );
+
+
+//    // unamed function expression
+//    seq.listen("play", function( event, data ) {
+
+//      ok(true, "fired");
+
+//      console.log( this, event.active, seq.active );
+//      //equal( event.type, "play", "Custom Event `foo` fired");
+//      //same( data, { a: "alpha" }, "Correct data was passed to callback, " + JSON.stringify({ a: "alpha" }) );
+
+//    }).trigger("play");
+
+//  });
+
 }
 
 module("Player");
@@ -363,6 +396,7 @@ test("Normalized Dimensions", function () {
   function plus() { 
     if ( ++count === expects ) {
       start(); 
+      seq.remove();
     }
   }  
   
@@ -376,8 +410,6 @@ test("Normalized Dimensions", function () {
   
   seq.listen( "loadedmetadata", function( event ) {
 
-    //console.log( "loaded" );
-    //console.log( seq );
     seq.playlist.forEach( function( $p, idx ) {
       
       if ( !dims.width ) {
@@ -408,6 +440,7 @@ test("Reference Tests", function () {
   function plus() { 
     if ( ++count === expects ) {
       start(); 
+      seq.remove();
     }
   }
 
@@ -440,16 +473,13 @@ test("Reference Tests", function () {
   seq.listen( "loadedmetadata", function( event ) {
 
     equal( event.type, "loadedmetadata", "Artificial bubbling occurred" );
-		plus();
-		
+    plus();
+    
     //window.seq = seq;
 
     seq.play();
   });
-  
 });
-
-module("Playback");
 test("Finished Sequence Tests", function () {
   
   var expects = 2, 
@@ -460,32 +490,212 @@ test("Finished Sequence Tests", function () {
   function plus() { 
     if ( ++count === expects ) {
       start(); 
+      seq.remove();
     }
-  }
-
+  }    
   stop(360000);
 
 
-  var seq2 = Popcorn.sequence( "video-sequence-a", remoteMediaList ),
-      dims = {
-        width: 0,
-        height: 0
-      };
+  var seq = Popcorn.sequence( "video-sequence-a", remoteMediaList );
 
-  seq2.listen( "pause", function() {
+  seq.listen( "pause", function() {
  
-    if ( seq2.active === seq2.playlist.length - 1 && seq2.playlist[seq2.active].media.currentTime >  seq2.clips[seq2.active].in ) {
-      equal( Math.floor(seq2.playlist[ seq2.active ].media.currentTime), seq2.clips[ seq2.active ].out, "The sequence had ended at the correct time" );
+    if ( seq.active === seq.playlist.length - 1 && seq.playlist[seq.active].media.currentTime >  seq.inOuts.ofVideos[seq.active].in ) {
+      equal( Math.floor(seq.playlist[ seq.active ].media.currentTime), seq.inOuts.ofVideos[ seq.active ].out, "The sequence had ended at the correct time" );
       plus();
-      equal( seq2.active, seq2.playlist.length -1, "The last video clip is displayed" );
+      equal( seq.active, seq.playlist.length -1, "The last video clip is displayed" );
       plus();
     }
   });
   
-  seq2.listen( "loadedmetadata", function( event ) {
-
-    seq2.play();
+  seq.listen( "loadedmetadata", function( event ) {
+    seq.play();
   });
 
 });
+
+
+module("Custom Events");
+test("listen(Custom)/trigger(Custom)", function () {
+  
+  var expects = 4;
+
+  expect(expects);
+  
+  var seq = Popcorn.sequence( "video-sequence-b", mixedSourceList );
+
+
+  // unamed function expression
+  seq.listen("foo", function( event, data ) {
+
+    equal( event.type, "foo", "Custom Event `foo` fired");
+    same( data, { a: "alpha" }, "Correct data was passed to callback, " + JSON.stringify({ a: "alpha" }) );
+
+  }).trigger("foo", { a: "alpha" });
+
+  
+  // named function expression
+  function barFn( event, data ) {
+    equal( event.type, "bar", "Custom Event `bar` fired");
+    same( data, { b: "beta" }, "Correct data was passed to callback, " + JSON.stringify({ b: "beta" }) );
+
+    seq.remove();
+  }
+
+  seq.listen("bar", barFn).trigger("bar", { b: "beta" });
+
+});
+
+module("Event Hooks");
+test("Cycle", function () {
+  
+  var expects = mixedSourceList.length - 1, 
+      count = 0, index = 0;
+
+  expect(expects * 3);
+  
+  function plus() { 
+    if ( ++count === expects * 3 ) {
+      start(); 
+      seq.remove();
+    }
+  }
+
+  stop(60000);
+
+ 
+  var seq = Popcorn.sequence( "video-sequence-b", mixedSourceList );
+
+
+  seq.listen( "canplaythrough", function( event ) {
+
+    seq.listen("cycle", function( event, data ) {
+
+      //console.log( "cycle: ", event, data );
+
+      equal( data.position.previous, index, "previous position matches index counter" );
+      plus();
+
+      index++;
+      
+      equal( data.position.current, index, "current position matches incremented index counter" );
+      plus();
+
+      equal( event.type, "cycle", "cycle event: " + index );
+      plus();
+
+      
+    });
+
+    seq.play(); 
+  }); 
+
+});
+
+module("Plugin Support");
+test("Implementation", function() {
+
+  expect( Popcorn.registry.length );
+
+  Popcorn.forEach( Popcorn.manifest, function( obj, plugin ) {
+    ok( plugin in Popcorn.sequence.prototype, "Plugin: '"+plugin+"' exists in Popcorn.sequence.prototype" );    
+  });  
+});
+
+test("Functional", function () {
+  
+  var expects = 5, 
+      count = 0;
+
+  expect(expects);
+  
+  function plus() { 
+    if ( ++count === expects ) {
+      start(); 
+    }
+  }
+
+  stop(35000);
+
+ 
+  var seq = Popcorn.sequence( "video-sequence-b", mixedSourceList ),
+      tests = [
+        {
+          start: 1, 
+          end: seq.duration(),
+          text: "this footnote starts at 1s and persists for entire sequence<br>",
+          target: "footnote-container"
+        }, 
+        {
+          start: 1, 
+          end: seq.duration() - 2,
+          text: "this footnote appears at :01 and dissappears 2 seconds before the end of the sequence<br>",
+          target: "footnote-container"
+        }, 
+        {
+          start: 5, 
+          end: 7.9,
+          text: "this footnote appears at 5s and dissappears at 7s; spanning 1 clip<br>",
+          target: "footnote-container"
+        }, 
+        {
+          start: 3, 
+          end: 6.9,
+          text: "this footnote appears at 3s and dissappears at 6s; Spanning 2 clips<br>",
+          target: "footnote-container"
+        }, 
+        {
+          start: 3, 
+          end: 9.9,
+          text: "this footnote appears at 3s and dissappears at 9s; Spanning 3 clips<br>",
+          target: "footnote-container"
+        }
+      ], 
+      expecting = [ 2, 2, 2, 1 ], 
+      index = 0;
+
+
+  seq.listen( "canplaythrough", function( event ) {
+
+    equal( seq.duration(), 13, "This sequence is 13 seconds long" );
+    plus();
+
+    //console.log( seq, seq.duration() );
+
+    tests.forEach(function( test, idx ) {
+      //console.log( test );
+
+      seq.footnote( test );
+
+    });
+
+    seq.listen("cycle", function( event, data ) {
+
+      setTimeout(function() {
+
+        var visibles = [],
+        nodes = document.getElementById("footnote-container").childNodes;
+
+        [].forEach.call( nodes, function( node ) {
+          if ( node.style.display !== "none" ) {
+            visibles.push(node);
+          }
+        });
+
+        equal( visibles.length, expecting[ index ], "Visible footnotes: " + expecting[ index ] );
+        plus();
+
+        index++;
+
+      }, 1000);
+
+    });
+
+
+    seq.play();
+  }); 
+
+});
+
+
 

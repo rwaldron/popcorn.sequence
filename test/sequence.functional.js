@@ -19,7 +19,7 @@ $(function() {
         out: 5
       },
       {
-        src: "http://ia600208.us.archive.org/5/items/Brunette_2/Brunette_2" + useType,  
+        src: "http://ia700208.us.archive.org/5/items/Brunette_2/Brunette_2" + useType,  
         in: 7,
         out: 10
       },
@@ -29,7 +29,7 @@ $(function() {
         out: 6
       },
       {
-        src: "http://ia600208.us.archive.org/0/items/Blonde_2/Blonde_2" + useType, 
+        src: "http://ia700208.us.archive.org/0/items/Blonde_2/Blonde_2" + useType, 
         in: 20,
         out: 22
       },
