@@ -6,12 +6,12 @@ var useOgv = document.createElement("video").canPlayType("video/ogg") === "maybe
     
     localMediaList = [
       { 
-        src: "../../test/assets/snowdriving.ogv", 
+        src: "assets/snowdriving.ogv", 
         in: 10,
         out: 13
       }, 
       {
-        src: "../../test/assets/eich.ogv",
+        src: "assets/eich.ogv",
         in: 8, 
         out: 11
       }
@@ -45,7 +45,7 @@ var useOgv = document.createElement("video").canPlayType("video/ogg") === "maybe
         out: 10
       }, 
       {
-        src: "../../test/assets/snowdriving.ogv",
+        src: "assets/snowdriving.ogv",
         in: 11,
         out: 13
       }, 
