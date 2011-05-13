@@ -1,4 +1,3 @@
-
 var useOgv = document.createElement("video").canPlayType("video/ogg") === "maybe" && 
                   !document.createElement("video").canPlayType("video/mp4"), 
 
@@ -487,6 +486,3 @@ test("Finished Sequence Tests", function () {
   });
 
 });
-
-
-
