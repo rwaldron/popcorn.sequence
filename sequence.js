@@ -214,7 +214,7 @@
     ioVideos = this.inOuts.ofVideos, 
     current = queue[ idx ], 
     nextIdx = 0, 
-    next, clip, $pop;
+    next, clip;
 
     
     var // Popcorn instances
@@ -513,7 +513,7 @@
         // Call the plugin on the appropriate Popcorn object in the playlist
         // Merge original options object & compiled (start/end) object into
         // a new fresh object
-        this.playlist[ idx ][ plugin ]( 
+        this.playlist[ play ][ plugin ]( 
 
           Popcorn.extend( {}, options, compile )
 

@@ -634,24 +634,24 @@ test("Functional", function () {
         }, 
         {
           start: 5, 
-          end: 7.9,
+          end: 7,
           text: "this footnote appears at 5s and dissappears at 7s; spanning 1 clip<br>",
           target: "footnote-container"
         }, 
         {
           start: 3, 
-          end: 6.9,
+          end: 7,
           text: "this footnote appears at 3s and dissappears at 6s; Spanning 2 clips<br>",
           target: "footnote-container"
         }, 
         {
           start: 3, 
-          end: 9.9,
+          end: 9,
           text: "this footnote appears at 3s and dissappears at 9s; Spanning 3 clips<br>",
           target: "footnote-container"
         }
       ], 
-      expecting = [ 2, 2, 2, 1 ], 
+      expecting = [ 2, 5, 3, 1 ], 
       index = 0;
 
 
@@ -670,9 +670,7 @@ test("Functional", function () {
     });
 
     seq.listen("cycle", function( event, data ) {
-
       setTimeout(function() {
-
         var visibles = [],
         nodes = document.getElementById("footnote-container").childNodes;
 
