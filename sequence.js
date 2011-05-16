@@ -181,14 +181,14 @@
 
         var target = event.srcElement || event.target, 
             seqIdx = +( target.dataset && target.dataset.sequenceId || target.getAttribute("data-sequence-id") ), 
-            round = Math.round( media.currentTime );
+            floor = Math.floor( media.currentTime );
 
-        if ( self.times.last !== round && 
+        if ( self.times.last !== floor && 
               seqIdx === self.active ) {
 
-          self.times.last = round;
+          self.times.last = floor;
           
-          if ( round === self.inOuts.ofVideos[ seqIdx ].out + 1 ) {
+          if ( floor === self.inOuts.ofVideos[ seqIdx ].out ) {
 
             Popcorn.sequence.cycle.call( self, seqIdx );
           }
@@ -214,7 +214,7 @@
     ioVideos = this.inOuts.ofVideos, 
     current = queue[ idx ], 
     nextIdx = 0, 
-    next, clip, $pop;
+    next, clip;
 
     
     var // Popcorn instances
@@ -338,8 +338,8 @@
 
       // Creating a one second track event with an empty end
       Popcorn.addTrackEvent( this.playlist[ index ], {
-        start: time,
-        end: time + 1,
+        start: time - 1,
+        end: time,
         _running: false,
         _natives: {
           start: fn || Popcorn.nop,
@@ -513,7 +513,7 @@
         // Call the plugin on the appropriate Popcorn object in the playlist
         // Merge original options object & compiled (start/end) object into
         // a new fresh object
-        this.playlist[ idx ][ plugin ]( 
+        this.playlist[ play ][ plugin ]( 
 
           Popcorn.extend( {}, options, compile )
 
