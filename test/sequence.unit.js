@@ -670,7 +670,9 @@ test("Functional", function () {
     });
 
     seq.listen("cycle", function( event, data ) {
+    
       setTimeout(function() {
+     
         var visibles = [],
         nodes = document.getElementById("footnote-container").childNodes;
 
