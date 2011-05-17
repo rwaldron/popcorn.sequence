@@ -1,6 +1,6 @@
 var JSHINT = require("./lib/jshint").JSHINT,
 	print = require("sys").print,
-	src = require("fs").readFileSync("sequence.js", "utf8");
+	src = require("fs").readFileSync("popcorn.sequence.js", "utf8");
 
 JSHINT(src, { evil: true, forin: true, maxerr: 100 });
 
