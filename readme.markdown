@@ -1,4 +1,4 @@
-# Popcorn: Sequence.js
+# Popcorn.sequence.js
 
 ### Create video clip sequences that playback seamlessly
 
