@@ -6,12 +6,15 @@
  *
  */
 
+/* jslint forin: true, maxerr: 50, indent: 4, es5: true  */
+/* global Popcorn: true */
 
 // Requires Popcorn.js
 (function( global, Popcorn ) {
 
   // TODO: as support increases, migrate to element.dataset 
   var doc = global.document, 
+      location = global.location,
       rprotocol = /:\/\//, 
       // TODO: better solution to this sucky stop-gap
       lochref = location.href.replace( location.href.split("/").slice(-1)[0], "" ), 
@@ -105,10 +108,14 @@
       // Push this video into the sequence queue
       self.queue.push( video );
 
+      var //satisfy lint
+       mIn = media.in, 
+       mOut = media.out;
+       
       // Push the in/out points into sequence ioVideos
       self.inOuts.ofVideos.push({ 
-        "in": ( "in" in media ) && media.in || 1,
-        "out": ( "out" in media ) && media.out || 0
+        "in": ( mIn !== undefined && mIn ) || 1,
+        "out": ( mOut !== undefined && mOut ) || 0
       });
 
       self.inOuts.ofVideos[ idx ].out = self.inOuts.ofVideos[ idx ].out || self.inOuts.ofVideos[ idx ].in + 2;
@@ -145,10 +152,7 @@
 
     Popcorn.forEach( this.queue, function( media, idx ) {
 
-      var // Context sensitive callbacks
-      canPlayThrough = function( event ) {
-
-        var target = event.srcElement || event.target;
+      function canPlayThrough( event ) {
 
         // If this is idx zero, use it as dimension for all
         if ( !idx ) {
@@ -159,7 +163,9 @@
         media.currentTime = self.inOuts.ofVideos[ idx ].in - 0.5;
 
         media.removeEventListener( "canplaythrough", canPlayThrough, false );
-      };
+
+        return true;
+      }
 
       // Hook up event listeners for managing special playback 
       media.addEventListener( "canplaythrough", canPlayThrough, false );
@@ -180,7 +186,7 @@
       media.addEventListener( "timeupdate", function( event ) {
 
         var target = event.srcElement || event.target, 
-            seqIdx = +( target.dataset && target.dataset.sequenceId || target.getAttribute("data-sequence-id") ), 
+            seqIdx = +(  (target.dataset && target.dataset.sequenceId) || target.getAttribute("data-sequence-id") ), 
             floor = Math.floor( media.currentTime );
 
         if ( self.times.last !== floor && 
@@ -201,15 +207,14 @@
 
   Popcorn.sequence.init.prototype = Popcorn.sequence.prototype;
 
-	//	
+  //  
   Popcorn.sequence.cycle = function( idx ) {
 
-		if ( !("queue" in this ) ) {
-			Popcorn.error("Popcorn.sequence.cycle is not a public method");
-		}
+    if ( !this.queue ) {
+      Popcorn.error("Popcorn.sequence.cycle is not a public method");
+    }
 
     var // Localize references
-    self = this, 
     queue = this.queue, 
     ioVideos = this.inOuts.ofVideos, 
     current = queue[ idx ], 
@@ -304,10 +309,11 @@
     duration: function() {
 
       var ret = 0, 
-          seq = this.inOuts.ofClips;
+          seq = this.inOuts.ofClips, 
+          idx = 0;
 
-      for ( var i = 0; i < seq.length; i++ ) {
-        ret += seq[ i ].out - seq[ i ].in + 1;
+      for ( idx; idx < seq.length; idx++ ) {
+        ret += seq[ idx ].out - seq[ idx ].in + 1;
       }
 
       return ret - 1;
@@ -322,9 +328,7 @@
     // Attach an event to a single point in time
     exec: function ( time, fn ) {
 
-      var self = this, 
-          index = this.active, 
-          offsetBy;
+      var index = this.active;
       
       this.inOuts.ofClips.forEach(function( off, idx ) {
         if ( time >= off.in && time <= off.out ) {
@@ -360,6 +364,10 @@
           count = 0, 
           fnName;
 
+      if ( !callback ) {
+        callback = Popcorn.nop;
+      }
+
       // Handling for DOM and Media events
       if ( Popcorn.Events.Natives.indexOf( type ) > -1 ) {
         Popcorn.forEach( seq, function( video ) {
@@ -370,11 +378,11 @@
             
             if ( excludes.indexOf( type ) > -1 ) {
 
-              callback && callback.call( video, event );
+              callback.call( video, event );
 
             } else {
               if ( ++count === total ) {
-                callback && callback.call( video, event );
+                callback.call( video, event );
               }
             }
           });
@@ -401,15 +409,14 @@
       // TODO: finish implementation
     },
     trigger: function( type, data ) {
-      var self = this, 
-          seq = this.playlist,
-          total = seq.length;
+      var self = this;
 
       // Handling for DOM and Media events
       if ( Popcorn.Events.Natives.indexOf( type ) > -1 ) {
 
         //  find the active video and trigger api events on that video.
-      
+        return;
+
       } else {
 
         // Only proceed if there are events of this type
@@ -481,12 +488,12 @@
           clipInOut = vClip.clipIdx;
           clipRange = range( clip.in, clip.out );
 
-          if ( "start" in vClip ) {
+          if ( vClip.start ) {
             compile.start = clipRange[ clipInOut ];
             compile.end = clipRange[ clipRange.length - 1 ];
           }
 
-          if ( "end" in vClip ) {
+          if ( vClip.end ) {
             compile.start = clipRange[ 0 ];
             compile.end = clipRange[ clipInOut ];
           }
