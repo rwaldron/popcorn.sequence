@@ -109,8 +109,8 @@
       self.queue.push( video );
 
       var //satisfy lint
-       mIn = media.in, 
-       mOut = media.out;
+       mIn = media["in"], 
+       mOut = media["out"];
        
       // Push the in/out points into sequence ioVideos
       self.inOuts.ofVideos.push({ 
@@ -118,7 +118,7 @@
         "out": ( mOut !== undefined && mOut ) || 0
       });
 
-      self.inOuts.ofVideos[ idx ].out = self.inOuts.ofVideos[ idx ].out || self.inOuts.ofVideos[ idx ].in + 2;
+      self.inOuts.ofVideos[ idx ]["out"] = self.inOuts.ofVideos[ idx ]["out"] || self.inOuts.ofVideos[ idx ]["in"] + 2;
       
       // Set the sources
       video.src = !rprotocol.test( media.src ) ? lochref + media.src : media.src;
@@ -127,7 +127,7 @@
       video.setAttribute("data-sequence-owner", parent );
       video.setAttribute("data-sequence-guid", self.seqId );
       video.setAttribute("data-sequence-id", idx );
-      video.setAttribute("data-sequence-clip", [ self.inOuts.ofVideos[ idx ].in, self.inOuts.ofVideos[ idx ].out ].join(":") );
+      video.setAttribute("data-sequence-clip", [ self.inOuts.ofVideos[ idx ]["in"], self.inOuts.ofVideos[ idx ]["out"] ].join(":") );
 
       // Append the video to the parent element
       self.parent.appendChild( video );
@@ -139,7 +139,7 @@
 
     self.inOuts.ofVideos.forEach(function( obj ) {
 
-      var clipDuration = obj.out - obj.in, 
+      var clipDuration = obj["out"] - obj["in"], 
           offs = {
             "in": clipOffset,
             "out": clipOffset + clipDuration
@@ -147,7 +147,7 @@
 
       self.inOuts.ofClips.push( offs );
       
-      clipOffset = offs.out + 1;
+      clipOffset = offs["out"] + 1;
     });
 
     Popcorn.forEach( this.queue, function( media, idx ) {
@@ -160,7 +160,7 @@
           self.dims.height = media.videoHeight;
         }
         
-        media.currentTime = self.inOuts.ofVideos[ idx ].in - 0.5;
+        media.currentTime = self.inOuts.ofVideos[ idx ]["in"] - 0.5;
 
         media.removeEventListener( "canplaythrough", canPlayThrough, false );
 
@@ -194,7 +194,7 @@
 
           self.times.last = floor;
           
-          if ( floor === self.inOuts.ofVideos[ seqIdx ].out ) {
+          if ( floor === self.inOuts.ofVideos[ seqIdx ]["out"] ) {
 
             Popcorn.sequence.cycle.call( self, seqIdx );
           }
@@ -255,10 +255,10 @@
       current.pause();
 
       this.active = nextIdx;
-      this.times.last = clip.in - 1;
+      this.times.last = clip["in"] - 1;
 
       // Play the next video in the sequence
-      $popnext.currentTime( clip.in );
+      $popnext.currentTime( clip["in"] );
 
       $popnext[ nextIdx ? "play" : "pause" ]();
 
@@ -312,8 +312,8 @@
           seq = this.inOuts.ofClips, 
           idx = 0;
 
-      for ( idx; idx < seq.length; idx++ ) {
-        ret += seq[ idx ].out - seq[ idx ].in + 1;
+      for ( ; idx < seq.length; idx++ ) {
+        ret += seq[ idx ]["out"] - seq[ idx ]["in"] + 1;
       }
 
       return ret - 1;
@@ -331,14 +331,14 @@
       var index = this.active;
       
       this.inOuts.ofClips.forEach(function( off, idx ) {
-        if ( time >= off.in && time <= off.out ) {
+        if ( time >= off["in"] && time <= off["out"] ) {
           index = idx;
         }
       });
 
       //offsetBy = time - self.inOuts.ofVideos[ index ].in;
       
-      time += this.inOuts.ofVideos[ index ].in - this.inOuts.ofClips[ index ].in;
+      time += this.inOuts.ofVideos[ index ]["in"] - this.inOuts.ofClips[ index ]["in"];
 
       // Creating a one second track event with an empty end
       Popcorn.addTrackEvent( this.playlist[ index ], {
@@ -448,7 +448,7 @@
         // store reference 
         off = this.inOuts.ofClips[ idx ];
         // array to test against
-        inOuts = range( off.in, off.out );
+        inOuts = range( off["in"], off["out"] );
 
         inIdx = inOuts.indexOf( options.start );
         outIdx = inOuts.indexOf( options.end );
@@ -486,7 +486,7 @@
           // has instructions
           clip = this.inOuts.ofVideos[ play ];
           clipInOut = vClip.clipIdx;
-          clipRange = range( clip.in, clip.out );
+          clipRange = range( clip["in"], clip["out"] );
 
           if ( vClip.start ) {
             compile.start = clipRange[ clipInOut ];
@@ -503,8 +503,8 @@
           
         } else {
 
-          compile.start = this.inOuts.ofVideos[ play ].in;
-          compile.end = this.inOuts.ofVideos[ play ].out;
+          compile.start = this.inOuts.ofVideos[ play ]["in"];
+          compile.end = this.inOuts.ofVideos[ play ]["out"];
 
           //compile.start += 0.1;
           //compile.end += 0.9;
