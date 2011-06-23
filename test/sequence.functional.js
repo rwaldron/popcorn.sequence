@@ -14,7 +14,7 @@ $(function() {
 		useType = useOgv && ".ogv" || "_512kb.mp4", 
   	clips = [
       {
-        src: "http://ia600102.us.archive.org/23/items/HotNumber/HotNumber" + useType,  
+        src: "http://ia600502.us.archive.org/23/items/HotNumber/HotNumber" + useType,  
         in: 0, 
         out: 5
       },

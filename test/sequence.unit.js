@@ -30,12 +30,12 @@ var useOgv = document.createElement("video").canPlayType("video/ogg") === "maybe
     ], 
     mixedSourceList = [
       {
-        src: "http://ia600102.us.archive.org/23/items/HotNumber/HotNumber" + useType,  
+        src: "http://ia600502.us.archive.org/23/items/HotNumber/HotNumber" + useType,  
         in: 0, 
         out: 2
       },
       {
-        src: "http://ia600102.us.archive.org/23/items/HotNumber/HotNumber" + useType,  
+        src: "http://ia600502.us.archive.org/23/items/HotNumber/HotNumber" + useType,  
         in: 5, 
         out: 7
       },
