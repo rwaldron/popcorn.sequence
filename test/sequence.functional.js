@@ -11,15 +11,18 @@ $(function() {
 		useOgv = document.createElement("video").canPlayType("video/ogg") === "maybe" && 
 									!document.createElement("video").canPlayType("video/mp4"), 
 
-		useType = useOgv && ".ogv" || "_512kb.mp4", 
+		useType = useOgv && ".ogv" || ".webm",
+
+		srcVideo = "http://videos.mozilla.org/serv/webmademovies/popcorntest" + useType,
+
   	clips = [
       {
-        src: "http://ia600502.us.archive.org/23/items/HotNumber/HotNumber" + useType,  
+        src: srcVideo,  
         in: 0, 
         out: 5
       },
       {
-        src: "http://ia700208.us.archive.org/5/items/Brunette_2/Brunette_2" + useType,  
+        src: srcVideo,  
         in: 7,
         out: 10
       },
@@ -29,7 +32,7 @@ $(function() {
         out: 6
       },
       {
-        src: "http://ia700208.us.archive.org/0/items/Blonde_2/Blonde_2" + useType, 
+        src: srcVideo, 
         in: 20,
         out: 22
       },

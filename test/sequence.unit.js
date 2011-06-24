@@ -2,7 +2,9 @@
 var useOgv = document.createElement("video").canPlayType("video/ogg") === "maybe" && 
                   !document.createElement("video").canPlayType("video/mp4"), 
 
-    useType = useOgv && ".ogv" || "_512kb.mp4", 
+    useType = useOgv && ".ogv" || ".webm",
+    
+    srcVideo = "http://videos.mozilla.org/serv/webmademovies/popcorntest" + useType,
     
     localMediaList = [
       { 
@@ -18,29 +20,29 @@ var useOgv = document.createElement("video").canPlayType("video/ogg") === "maybe
     ],  
     remoteMediaList = [
       {
-        src: "http://ia700208.us.archive.org/5/items/Brunette_2/Brunette_2" + useType,  
+        src: srcVideo,  
         in: 3,
         out: 6
       },
       {
-        src: "http://ia700208.us.archive.org/0/items/Blonde_2/Blonde_2" + useType,  
+        src: srcVideo,  
         in: 6,
         out: 9
       }
     ], 
     mixedSourceList = [
       {
-        src: "http://ia600502.us.archive.org/23/items/HotNumber/HotNumber" + useType,  
+        src: srcVideo,  
         in: 0, 
         out: 2
       },
       {
-        src: "http://ia600502.us.archive.org/23/items/HotNumber/HotNumber" + useType,  
+        src: srcVideo,  
         in: 5, 
         out: 7
       },
       {
-        src: "http://ia700208.us.archive.org/5/items/Brunette_2/Brunette_2" + useType,  
+        src: srcVideo,  
         in: 8,
         out: 10
       }, 
@@ -50,7 +52,7 @@ var useOgv = document.createElement("video").canPlayType("video/ogg") === "maybe
         out: 13
       }, 
       {
-        src: "http://ia700208.us.archive.org/0/items/Blonde_2/Blonde_2" + useType, 
+        src: srcVideo, 
         in: 14,
         out: 16
       }
