@@ -597,7 +597,7 @@ test("Cycle", function () {
 module("Plugin Support");
 test("Implementation", function() {
 
-  expect( Popcorn.registry.length );
+  expect( Popcorn.sizeOf(Popcorn.manifest) );
 
   Popcorn.forEach( Popcorn.manifest, function( obj, plugin ) {
     ok( plugin in Popcorn.sequence.prototype, "Plugin: '"+plugin+"' exists in Popcorn.sequence.prototype" );    
