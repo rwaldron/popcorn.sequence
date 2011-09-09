@@ -71,7 +71,7 @@ Sequences implement the following methods:
 	// TODO: Add sequence.listen() example
 
 
-## For seamless playback, besure to wrap playback in a "canplaythrough" event callback
+## For seamless playback, be sure to wrap playback in a "canplaythrough" event callback
 
 Todo:
 
