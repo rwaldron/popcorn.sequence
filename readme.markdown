@@ -4,22 +4,22 @@
 
 -------------------------
 Contributions should follow these guidelines:
-https://gist.github.com/793649
+http://github.com/rwldrn/idiomatic.js
 
 
 -------------------------
 Usage:
 
-	var sequence = Popcorn.sequence( 
-					"container-id", 
+	var sequence = Popcorn.sequence(
+					"container-id",
 					[
 						{
-							src: "assets/snowdriving.ogv",  
-							in: 0, 
+							src: "assets/snowdriving.ogv",
+							in: 0,
 							out: 5
 						},
 						{
-							src: "assets/snowdriving.ogv",  
+							src: "assets/snowdriving.ogv",
 							in: 7,
 							out: 10
 						},
@@ -43,7 +43,7 @@ Sequences implement the following methods:
 
 
 
-	// Play the sequence	
+	// Play the sequence
 
 	sequence.play();
 
@@ -61,7 +61,7 @@ Sequences implement the following methods:
 
 	sequence.listen( eventName, function() {
 
-		// canplaythrough, loadedmetadata, loadeddata events will fire only when all clips have fired 
+		// canplaythrough, loadedmetadata, loadeddata events will fire only when all clips have fired
 		// timeupdate, play, pause will fire on the currently active clip
 
 	});
