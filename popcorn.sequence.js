@@ -12,19 +12,19 @@
 // Requires Popcorn.js
 (function( global, Popcorn ) {
 
-  // TODO: as support increases, migrate to element.dataset 
-  var doc = global.document, 
+  // TODO: as support increases, migrate to element.dataset
+  var doc = global.document,
       location = global.location,
-      rprotocol = /:\/\//, 
+      rprotocol = /:\/\//,
       // TODO: better solution to this sucky stop-gap
-      lochref = location.href.replace( location.href.split("/").slice(-1)[0], "" ), 
+      lochref = location.href.replace( location.href.split("/").slice(-1)[0], "" ),
       // privately held
       range = function(start, stop, step) {
 
         start = start || 0;
         stop = ( stop || start || 0 ) + 1;
         step = step || 1;
-            
+
         var len = Math.ceil((stop - start) / step) || 0,
             idx = 0,
             range = [];
@@ -43,14 +43,14 @@
   };
 
   Popcorn.sequence.init = function( parent, list ) {
-    
+
     // Video element
     this.parent = doc.getElementById( parent );
-    
+
     // Store ref to a special ID
     this.seqId = Popcorn.guid( "__sequenced" );
 
-    // List of HTMLVideoElements 
+    // List of HTMLVideoElements
     this.queue = [];
 
     // List of Popcorn objects
@@ -60,7 +60,7 @@
     this.inOuts = {
 
       // Stores the video in/out times for each video in sequence
-      ofVideos: [], 
+      ofVideos: [],
 
       // Stores the clip in/out times for each clip in sequences
       ofClips: []
@@ -86,7 +86,7 @@
 
     };
 
-    var self = this, 
+    var self = this,
         clipOffset = 0;
 
     // Create `video` elements
@@ -109,17 +109,17 @@
       self.queue.push( video );
 
       var //satisfy lint
-       mIn = media["in"], 
+       mIn = media["in"],
        mOut = media["out"];
-       
+
       // Push the in/out points into sequence ioVideos
-      self.inOuts.ofVideos.push({ 
+      self.inOuts.ofVideos.push({
         "in": ( mIn !== undefined && mIn ) || 1,
         "out": ( mOut !== undefined && mOut ) || 0
       });
 
       self.inOuts.ofVideos[ idx ]["out"] = self.inOuts.ofVideos[ idx ]["out"] || self.inOuts.ofVideos[ idx ]["in"] + 2;
-      
+
       // Set the sources
       video.src = !rprotocol.test( media.src ) ? lochref + media.src : media.src;
 
@@ -131,22 +131,22 @@
 
       // Append the video to the parent element
       self.parent.appendChild( video );
-      
 
-      self.playlist.push( Popcorn("#" + video.id ) );      
+
+      self.playlist.push( Popcorn("#" + video.id ) );
 
     });
 
     self.inOuts.ofVideos.forEach(function( obj ) {
 
-      var clipDuration = obj["out"] - obj["in"], 
+      var clipDuration = obj["out"] - obj["in"],
           offs = {
             "in": clipOffset,
             "out": clipOffset + clipDuration
           };
 
       self.inOuts.ofClips.push( offs );
-      
+
       clipOffset = offs["out"] + 1;
     });
 
@@ -159,7 +159,7 @@
           self.dims.width = media.videoWidth;
           self.dims.height = media.videoHeight;
         }
-        
+
         media.currentTime = self.inOuts.ofVideos[ idx ]["in"] - 0.5;
 
         media.removeEventListener( "canplaythrough", canPlayThrough, false );
@@ -167,7 +167,7 @@
         return true;
       }
 
-      // Hook up event listeners for managing special playback 
+      // Hook up event listeners for managing special playback
       media.addEventListener( "canplaythrough", canPlayThrough, false );
 
       // TODO: consolidate & DRY
@@ -185,15 +185,15 @@
 
       media.addEventListener( "timeupdate", function( event ) {
 
-        var target = event.srcElement || event.target, 
-            seqIdx = +(  (target.dataset && target.dataset.sequenceId) || target.getAttribute("data-sequence-id") ), 
+        var target = event.srcElement || event.target,
+            seqIdx = +(  (target.dataset && target.dataset.sequenceId) || target.getAttribute("data-sequence-id") ),
             floor = Math.floor( media.currentTime );
 
-        if ( self.times.last !== floor && 
+        if ( self.times.last !== floor &&
               seqIdx === self.active ) {
 
           self.times.last = floor;
-          
+
           if ( floor === self.inOuts.ofVideos[ seqIdx ]["out"] ) {
 
             Popcorn.sequence.cycle.call( self, seqIdx );
@@ -207,7 +207,7 @@
 
   Popcorn.sequence.init.prototype = Popcorn.sequence.prototype;
 
-  //  
+  //
   Popcorn.sequence.cycle = function( idx ) {
 
     if ( !this.queue ) {
@@ -215,15 +215,15 @@
     }
 
     var // Localize references
-    queue = this.queue, 
-    ioVideos = this.inOuts.ofVideos, 
-    current = queue[ idx ], 
-    nextIdx = 0, 
+    queue = this.queue,
+    ioVideos = this.inOuts.ofVideos,
+    current = queue[ idx ],
+    nextIdx = 0,
     next, clip;
 
-    
+
     var // Popcorn instances
-    $popnext, 
+    $popnext,
     $popprev;
 
 
@@ -236,15 +236,15 @@
 
       nextIdx = 0;
       this.playlist[ idx ].pause();
-      
+
     } else {
-    
+
       next = queue[ nextIdx ];
       clip = ioVideos[ nextIdx ];
 
       // Constrain dimentions
       Popcorn.extend( next, {
-        width: this.dims.width, 
+        width: this.dims.width,
         height: this.dims.height
       });
 
@@ -263,23 +263,23 @@
       $popnext[ nextIdx ? "play" : "pause" ]();
 
       // Trigger custom cycling event hook
-      this.trigger( "cycle", { 
+      this.trigger( "cycle", {
 
         position: {
-          previous: idx, 
+          previous: idx,
           current: nextIdx
         }
-        
+
       });
-      
+
       // Set the previous back to it's beginning time
       // $popprev.currentTime( ioVideos[ idx ].in );
 
       if ( nextIdx ) {
         // Hide the currently ending video
         current.style.display = "none";
-        // Show the next video in the sequence    
-        next.style.display = "";    
+        // Show the next video in the sequence
+        next.style.display = "";
       }
 
       this.cycling = false;
@@ -289,14 +289,14 @@
   };
 
   var excludes = [ "timeupdate", "play", "pause" ];
-  
+
   // Sequence object prototype
   Popcorn.extend( Popcorn.sequence.prototype, {
 
     // Returns Popcorn object from sequence at index
     eq: function( idx ) {
       return this.playlist[ idx ];
-    }, 
+    },
     // Remove a sequence from it's playback display container
     remove: function() {
       this.parent.innerHTML = null;
@@ -308,8 +308,8 @@
     // Returns sum duration for all videos in sequence
     duration: function() {
 
-      var ret = 0, 
-          seq = this.inOuts.ofClips, 
+      var ret = 0,
+          seq = this.inOuts.ofClips,
           idx = 0;
 
       for ( ; idx < seq.length; idx++ ) {
@@ -329,7 +329,7 @@
     exec: function ( time, fn ) {
 
       var index = this.active;
-      
+
       this.inOuts.ofClips.forEach(function( off, idx ) {
         if ( time >= off["in"] && time <= off["out"] ) {
           index = idx;
@@ -337,7 +337,7 @@
       });
 
       //offsetBy = time - self.inOuts.ofVideos[ index ].in;
-      
+
       time += this.inOuts.ofVideos[ index ]["in"] - this.inOuts.ofClips[ index ]["in"];
 
       // Creating a one second track event with an empty end
@@ -354,14 +354,14 @@
 
       return this;
     },
-    // Binds event handlers that fire only when all 
+    // Binds event handlers that fire only when all
     // videos in sequence have heard the event
     listen: function( type, callback ) {
 
-      var self = this, 
+      var self = this,
           seq = this.playlist,
-          total = seq.length, 
-          count = 0, 
+          total = seq.length,
+          count = 0,
           fnName;
 
       if ( !callback ) {
@@ -375,7 +375,7 @@
           video.listen( type, function( event ) {
 
             event.active = self;
-            
+
             if ( excludes.indexOf( type ) > -1 ) {
 
               callback.call( video, event );
@@ -404,7 +404,7 @@
 
       // Return the sequence object
       return this;
-    }, 
+    },
     unlisten: function( type, name ) {
       // TODO: finish implementation
     },
@@ -441,11 +441,11 @@
     Popcorn.sequence.prototype[ plugin ] = function( options ) {
 
       // console.log( this, options );
-      var videos = {}, assignTo = [], 
+      var videos = {}, assignTo = [],
       idx, off, inOuts, inIdx, outIdx, keys, clip, clipInOut, clipRange;
 
       for ( idx = 0; idx < this.inOuts.ofClips.length; idx++  ) {
-        // store reference 
+        // store reference
         off = this.inOuts.ofClips[ idx ];
         // array to test against
         inOuts = range( off["in"], off["out"] );
@@ -462,7 +462,7 @@
 
         if ( outIdx > -1 ) {
           videos[ idx ] = Popcorn.extend( {}, off, {
-            end: inOuts[ outIdx ], 
+            end: inOuts[ outIdx ],
             clipIdx: outIdx
           });
         }
@@ -478,7 +478,7 @@
       for ( idx = 0; idx < assignTo.length; idx++ ) {
 
         var compile = {},
-        play = assignTo[ idx ], 
+        play = assignTo[ idx ],
         vClip = videos[ play ];
 
         if ( vClip ) {
@@ -500,7 +500,7 @@
 
           //compile.start += 0.1;
           //compile.end += 0.9;
-          
+
         } else {
 
           compile.start = this.inOuts.ofVideos[ play ]["in"];
@@ -508,10 +508,10 @@
 
           //compile.start += 0.1;
           //compile.end += 0.9;
-          
+
         }
 
-        // Handling full clip persistance 
+        // Handling full clip persistance
         //if ( compile.start === compile.end ) {
           //compile.start -= 0.1;
           //compile.end += 0.9;
@@ -520,17 +520,17 @@
         // Call the plugin on the appropriate Popcorn object in the playlist
         // Merge original options object & compiled (start/end) object into
         // a new fresh object
-        this.playlist[ play ][ plugin ]( 
+        this.playlist[ play ][ plugin ](
 
           Popcorn.extend( {}, options, compile )
 
         );
-        
+
       }
 
       // Return the sequence object
       return this;
     };
-    
+
   });
 })( this, Popcorn );
