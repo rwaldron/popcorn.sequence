@@ -167,7 +167,7 @@
         return true;
       }
 
-      // Hook up event listeners for managing special playback
+      // Hook up event oners for managing special playback
       media.addEventListener( "canplaythrough", canPlayThrough, false );
 
       // TODO: consolidate & DRY
@@ -326,7 +326,7 @@
       return this;
     },
     // Attach an event to a single point in time
-    exec: function ( time, fn ) {
+    cue: function ( time, fn ) {
 
       var index = this.active;
 
@@ -356,7 +356,7 @@
     },
     // Binds event handlers that fire only when all
     // videos in sequence have heard the event
-    listen: function( type, callback ) {
+    on: function( type, callback ) {
 
       var self = this,
           seq = this.playlist,
@@ -372,7 +372,7 @@
       if ( Popcorn.Events.Natives.indexOf( type ) > -1 ) {
         Popcorn.forEach( seq, function( video ) {
 
-          video.listen( type, function( event ) {
+          video.on( type, function( event ) {
 
             event.active = self;
 
@@ -405,10 +405,10 @@
       // Return the sequence object
       return this;
     },
-    unlisten: function( type, name ) {
+    off: function( type, name ) {
       // TODO: finish implementation
     },
-    trigger: function( type, data ) {
+    emit: function( type, data ) {
       var self = this;
 
       // Handling for DOM and Media events
@@ -431,8 +431,29 @@
       }
 
       return this;
+    },
+    currentTime: function() {
+
+      var index = this.active,
+          currentTime = 0;
+
+      this.inOuts.ofClips.forEach(function( off, idx ) {
+        if ( idx < index ) {
+          currentTime += this.inOuts.ofVideos[ idx ]["out"] - this.inOuts.ofVideos[ idx ]["in"];
+        }
+      }, this );
+// console.log( currentTime );
+      currentTime += this.playlist[ index ].currentTime() - this.inOuts.ofVideos[ index ]["in"];
+
+
+      return currentTime;
     }
   });
+
+  [ ["exec", "cue"], ["listen", "on"], ["unlisten", "off"], ["trigger", "emit"] ].forEach(function( remap ) {
+
+    Popcorn.sequence.prototype[ remap[0] ] = Popcorn.sequence.prototype[ remap[1] ];
+  })
 
 
   Popcorn.forEach( Popcorn.manifest, function( obj, plugin ) {
