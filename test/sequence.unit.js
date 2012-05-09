@@ -710,3 +710,35 @@ asyncTest("Get the current time in the sequence, not the video", function() {
 
 
 });
+
+asyncTest("Jump to time in the sequence, not the video", function() {
+
+  expect(2);
+
+  var seq = Popcorn.sequence( "video-sequence-b", remoteMediaList ),
+      hasRun = false;
+
+  seq.on( "loadedmetadata", function() {
+
+    // seq.play();
+    seq.cue( 2, function() {
+
+      seq.jumpTo(4.5);
+
+      //console.log( seq.currentTime() );
+    }).on( "timeupdate", function() {
+
+      if ( seq.active === 1 && !hasRun ) {
+        hasRun = true;
+
+        equal( seq.currentTime(), 2.5, "Sequence time is 2.5" );
+        equal( seq.playlist[ seq.active ].currentTime(), 5.5, "Actual video time is 5.5" );
+
+        seq.off( "timeupdate" );
+
+        start();
+      }
+    });
+    seq.play();
+  });
+});

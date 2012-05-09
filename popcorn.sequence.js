@@ -440,6 +440,32 @@
 
 
       return currentTime;
+    },
+    jumpTo: function( time ) {
+      var index, found, real;
+
+      found = false;
+
+      this.inOuts.ofClips.forEach(function( off, idx ) {
+        var inOuts = this.inOuts;
+
+        if ( !found &&
+              (time >= inOuts.ofClips[ idx ]["in"] &&
+                time <= inOuts.ofClips[ idx ]["out"]) ) {
+
+          found = true;
+          index = idx;
+          real = inOuts.ofVideos[ idx ]["in"] +
+                  ( inOuts.ofClips[ idx ]["in"] - time );
+        }
+      }, this );
+
+      Popcorn.sequence.cycle.call( this, index - 1 );
+
+      // Jump to the calculated time in the clip
+      this.playlist[ index ].currentTime( real );
+
+      return this;
     }
   });
 
