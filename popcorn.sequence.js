@@ -313,10 +313,27 @@
           idx = 0;
 
       for ( ; idx < seq.length; idx++ ) {
-        ret += seq[ idx ]["out"] - seq[ idx ]["in"] + 1;
+        ret += seq[ idx ]["out"] - seq[ idx ]["in"];
       }
 
       return ret - 1;
+    },
+    
+    currentTime: function() {
+
+      var time = 0;
+  		var index = this.active;
+  		
+  		this.inOuts.ofVideos.forEach(function( off, idx ) {
+  			if (idx < index) {
+  				time += (off["out"]-off["in"])+1;
+  			}
+  		});
+  		
+  		time += (Math.round(this.playlist[index].currentTime())-this.inOuts.ofVideos[index]["in"]);
+  
+  		return time;
+    	
     },
 
     play: function() {
