@@ -387,7 +387,6 @@
             }
           });
         });
-
       } else {
 
         // If no events registered with this name, create a cache
@@ -413,23 +412,17 @@
 
       // Handling for DOM and Media events
       if ( Popcorn.Events.Natives.indexOf( type ) > -1 ) {
-
         //  find the active video and trigger api events on that video.
         return;
-
       } else {
-
         // Only proceed if there are events of this type
         // currently registered on the sequence
         if ( this.events[ type ] ) {
-
           Popcorn.forEach( this.events[ type ], function( callback, name ) {
             callback.call( self, { type: type }, data );
           });
-
         }
       }
-
       return this;
     },
     currentTime: function() {
@@ -442,7 +435,7 @@
           currentTime += this.inOuts.ofVideos[ idx ]["out"] - this.inOuts.ofVideos[ idx ]["in"];
         }
       }, this );
-// console.log( currentTime );
+
       currentTime += this.playlist[ index ].currentTime() - this.inOuts.ofVideos[ index ]["in"];
 
 
@@ -454,7 +447,6 @@
 
     Popcorn.sequence.prototype[ remap[0] ] = Popcorn.sequence.prototype[ remap[1] ];
   })
-
 
   Popcorn.forEach( Popcorn.manifest, function( obj, plugin ) {
 
@@ -503,7 +495,6 @@
         vClip = videos[ play ];
 
         if ( vClip ) {
-
           // has instructions
           clip = this.inOuts.ofVideos[ play ];
           clipInOut = vClip.clipIdx;
@@ -518,40 +509,20 @@
             compile.start = clipRange[ 0 ];
             compile.end = clipRange[ clipInOut ];
           }
-
-          //compile.start += 0.1;
-          //compile.end += 0.9;
-
         } else {
-
           compile.start = this.inOuts.ofVideos[ play ]["in"];
           compile.end = this.inOuts.ofVideos[ play ]["out"];
-
-          //compile.start += 0.1;
-          //compile.end += 0.9;
-
         }
-
-        // Handling full clip persistance
-        //if ( compile.start === compile.end ) {
-          //compile.start -= 0.1;
-          //compile.end += 0.9;
-        //}
 
         // Call the plugin on the appropriate Popcorn object in the playlist
         // Merge original options object & compiled (start/end) object into
         // a new fresh object
         this.playlist[ play ][ plugin ](
-
           Popcorn.extend( {}, options, compile )
-
         );
-
       }
-
       // Return the sequence object
       return this;
     };
-
   });
 })( this, Popcorn );
