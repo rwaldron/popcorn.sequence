@@ -114,7 +114,10 @@
 
       // Push the in/out points into sequence ioVideos
       self.inOuts.ofVideos.push({
-        "in": ( mIn !== undefined && mIn ) || 1,
+        
+        //For correct duration()
+        //"in": ( mIn !== undefined && mIn ) || 1,
+        "in": ( mIn !== undefined && mIn ) || 0,
         "out": ( mOut !== undefined && mOut ) || 0
       });
 
@@ -146,8 +149,10 @@
           };
 
       self.inOuts.ofClips.push( offs );
-
-      clipOffset = offs["out"] + 1;
+      
+      //For correct duration()
+      //clipOffset = offs["out"] + 1;
+      clipOffset = offs["out"];
     });
 
     Popcorn.forEach( this.queue, function( media, idx ) {
@@ -306,6 +311,8 @@
       return this.inOuts.ofVideos[ idx ];
     },
     // Returns sum duration for all videos in sequence
+    
+    /*
     duration: function() {
 
       var ret = 0,
@@ -317,6 +324,19 @@
       }
 
       return ret - 1;
+    },*/
+    duration: function() {
+
+      var ret = 0,
+          seq = this.inOuts.ofClips,
+          idx = 0;
+       
+       
+      for ( ; idx < seq.length; idx++ ) {
+        ret += seq[ idx ]["out"] - seq[ idx ]["in"] ;
+      }
+
+      return ret;
     },
 
     play: function() {
@@ -324,6 +344,13 @@
       this.playlist[ this.active ].play();
 
       return this;
+    },
+    pause: function() {
+      
+    	this.playlist[ this.active ].pause();
+
+      return this;
+    	
     },
     // Attach an event to a single point in time
     cue: function ( time, fn ) {
