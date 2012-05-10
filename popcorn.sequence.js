@@ -340,8 +340,19 @@
     },
 
     play: function() {
-
-      this.playlist[ this.active ].play();
+      
+      //Do not play Sequence if last video arrived his end
+      if (	((this.queue.length-1) == this.active)
+      	&&	(this.inOuts["ofVideos"][this.active]["out"] >= Math.round(this.queue[this.active].currentTime)))
+      {
+        
+      	return this;
+        
+      } else {
+        
+       	this.playlist[ this.active ].play();
+         
+      }
 
       return this;
     },
