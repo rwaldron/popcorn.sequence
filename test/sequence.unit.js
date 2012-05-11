@@ -379,7 +379,7 @@ if ( !useOgv ) {
 
 //      console.log( this, event.active, seq.active );
 //      //equal( event.type, "play", "Custom Event `foo` fired");
-//      //same( data, { a: "alpha" }, "Correct data was passed to callback, " + JSON.stringify({ a: "alpha" }) );
+//      //deepEqual( data, { a: "alpha" }, "Correct data was passed to callback, " + JSON.stringify({ a: "alpha" }) );
 
 //    }).trigger("play");
 
@@ -463,7 +463,7 @@ asyncTest("Reference Tests", function () {
     seq.play();
   });
 });
-test("Finished Sequence Tests", function () {
+asyncTest("Finished Sequence Tests", function () {
 
   var expects = 2,
       count = 0;
@@ -476,8 +476,6 @@ test("Finished Sequence Tests", function () {
       seq.remove();
     }
   }
-  stop(360000);
-
 
   var seq = Popcorn.sequence( "video-sequence-a", remoteMediaList );
 
@@ -512,7 +510,7 @@ test("on(Custom)/trigger(Custom)", function () {
   seq.on("foo", function( event, data ) {
 
     equal( event.type, "foo", "Custom Event `foo` fired");
-    same( data, { a: "alpha" }, "Correct data was passed to callback, " + JSON.stringify({ a: "alpha" }) );
+    deepEqual( data, { a: "alpha" }, "Correct data was passed to callback, " + JSON.stringify({ a: "alpha" }) );
 
   }).trigger("foo", { a: "alpha" });
 
@@ -520,7 +518,7 @@ test("on(Custom)/trigger(Custom)", function () {
   // named function expression
   function barFn( event, data ) {
     equal( event.type, "bar", "Custom Event `bar` fired");
-    same( data, { b: "beta" }, "Correct data was passed to callback, " + JSON.stringify({ b: "beta" }) );
+    deepEqual( data, { b: "beta" }, "Correct data was passed to callback, " + JSON.stringify({ b: "beta" }) );
 
     seq.remove();
   }
@@ -544,7 +542,7 @@ test("Cycle", function () {
     }
   }
 
-  stop(60000);
+  stop();
 
 
   var seq = Popcorn.sequence( "video-sequence-b", mixedSourceList );
@@ -598,7 +596,7 @@ test("Functional", function () {
     }
   }
 
-  stop(35000);
+  stop();
 
 
   var seq = Popcorn.sequence( "video-sequence-b", mixedSourceList ),
