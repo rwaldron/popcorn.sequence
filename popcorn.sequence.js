@@ -200,6 +200,14 @@
           }
         }
       }, false );
+
+      media.addEventListener( "ended", function( event ) {
+
+        var target = event.srcElement || event.target,
+            seqIdx = +(  (target.dataset && target.dataset.sequenceId) || target.getAttribute("data-sequence-id") );
+
+        Popcorn.sequence.cycle.call( self, seqIdx );
+      }, false );
     });
 
     return this;
