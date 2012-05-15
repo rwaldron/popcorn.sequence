@@ -114,8 +114,8 @@
 
       // Push the in/out points into sequence ioVideos
       self.inOuts.ofVideos.push({
-        "in": ( mIn !== undefined && mIn ) || 1,
-        "out": ( mOut !== undefined && mOut ) || 0
+        "in": mIn !== undefined && typeof mIn === "number" ?  mIn : 1,
+        "out": mOut !== undefined && typeof mOut === "number" ? mOut : 0
       });
 
       self.inOuts.ofVideos[ idx ]["out"] = self.inOuts.ofVideos[ idx ]["out"] || self.inOuts.ofVideos[ idx ]["in"] + 2;
@@ -147,7 +147,7 @@
 
       self.inOuts.ofClips.push( offs );
 
-      clipOffset = offs["out"] + 1;
+      clipOffset = offs["out"];
     });
 
     Popcorn.forEach( this.queue, function( media, idx ) {
@@ -160,7 +160,8 @@
           self.dims.height = media.videoHeight;
         }
 
-        media.currentTime = self.inOuts.ofVideos[ idx ]["in"] - 0.5;
+        // -0.2 prevents trackEvents from firing when they trigger on a clips in value
+        media.currentTime = self.inOuts.ofVideos[ idx ]["in"] - 0.2;
 
         media.removeEventListener( "canplaythrough", canPlayThrough, false );
 
@@ -321,10 +322,10 @@
           idx = 0;
 
       for ( ; idx < seq.length; idx++ ) {
-        ret += seq[ idx ]["out"] - seq[ idx ]["in"] + 1;
+        ret += seq[ idx ]["out"] - seq[ idx ]["in"];
       }
 
-      return ret - 1;
+      return ret;
     },
 
     play: function() {
@@ -348,17 +349,8 @@
 
       time += this.inOuts.ofVideos[ index ]["in"] - this.inOuts.ofClips[ index ]["in"];
 
-      // Creating a one second track event with an empty end
-      Popcorn.addTrackEvent( this.playlist[ index ], {
-        start: time - 1,
-        end: time,
-        _running: false,
-        _natives: {
-          start: fn || Popcorn.nop,
-          end: Popcorn.nop,
-          type: "exec"
-        }
-      });
+      // Cue up the callback on the correct popcorn instance
+      this.playlist[ index ].cue( time, fn );
 
       return this;
     },
@@ -446,7 +438,6 @@
 
       currentTime += this.playlist[ index ].currentTime() - this.inOuts.ofVideos[ index ]["in"];
 
-
       return currentTime;
     },
     jumpTo: function( time ) {
@@ -487,9 +478,9 @@
     // Implement passthrough methods to plugins
     Popcorn.sequence.prototype[ plugin ] = function( options ) {
 
-      // console.log( this, options );
       var videos = {}, assignTo = [],
-      idx, off, inOuts, inIdx, outIdx, keys, clip, clipInOut, clipRange;
+          idx, off, inOuts, inIdx, outIdx,
+          keys, clip, clipInOut, clipRange;
 
       for ( idx = 0; idx < this.inOuts.ofClips.length; idx++  ) {
         // store reference
@@ -521,7 +512,6 @@
 
       assignTo = range( keys[ 0 ], keys[ 1 ] );
 
-      //console.log( "PLUGIN CALL MAPS: ", videos, keys, assignTo );
       for ( idx = 0; idx < assignTo.length; idx++ ) {
 
         var compile = {},
@@ -550,7 +540,7 @@
 
         // Call the plugin on the appropriate Popcorn object in the playlist
         // Merge original options object & compiled (start/end) object into
-        // a new fresh object
+        // a new object
         this.playlist[ play ][ plugin ](
           Popcorn.extend( {}, options, compile )
         );

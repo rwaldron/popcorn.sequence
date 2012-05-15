@@ -435,11 +435,9 @@ asyncTest("Reference Tests", function () {
         width: 0,
         height: 0
       };
-  //[ 4, 7, 11, 15, 19, 22 ]
-  [ 1, 4, 7, 10, 13 ].forEach(function( time, idx ) {
+  [ 1, 3, 5, 7, 9 ].forEach(function( time, idx ) {
 
     seq.cue( time, function() {
-      //console.log( seq.active, time );
       equal( seq.active, idx, "video " + idx + " is active" );
 
       // currentSrc will force resources to have abs url, thus making local resources unmatchable
@@ -450,10 +448,6 @@ asyncTest("Reference Tests", function () {
         seq.remove();
       }
     });
-  });
-
-  seq.playlist.forEach(function( pop ) {
-    //console.log( pop.data.trackEvents.byStart );
   });
 
   seq.on( "loadedmetadata", function( event ) {
@@ -632,19 +626,16 @@ test("Functional", function () {
           target: "footnote-container"
         }
       ],
-      expecting = [ 2, 5, 3, 1 ],
+      expecting = [ 2, 4, 5, 2 ],
       index = 0;
 
 
   seq.on( "canplaythrough", function( event ) {
 
-    equal( seq.duration(), 13, "This sequence is 13 seconds long" );
+    equal( seq.duration(), 10, "This sequence is 10 seconds long" );
     plus();
 
-    //console.log( seq, seq.duration() );
-
     tests.forEach(function( test, idx ) {
-      //console.log( test );
 
       seq.footnote( test );
 
@@ -662,7 +653,6 @@ test("Functional", function () {
             visibles.push(node);
           }
         });
-
         equal( visibles.length, expecting[ index ], "Visible footnotes: " + expecting[ index ] );
         plus();
 
@@ -729,8 +719,8 @@ asyncTest("Jump to time in the sequence, not the video", function() {
       if ( seq.active === 1 && !hasRun ) {
         hasRun = true;
 
-        equal( seq.currentTime(), 2.5, "Sequence time is 2.5" );
-        equal( seq.playlist[ seq.active ].currentTime(), 5.5, "Actual video time is 5.5" );
+        equal( seq.currentTime(), 1.5, "Sequence time is 2.5" );
+        equal( seq.playlist[ seq.active ].currentTime(), 4.5, "Actual video time is 5.5" );
 
         seq.off( "timeupdate" );
 
