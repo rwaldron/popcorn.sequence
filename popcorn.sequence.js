@@ -77,6 +77,9 @@
     this.cycling = false;
     this.playing = false;
 
+    // duration of whole sequence
+    this.duration = 0;
+
     this.times = {
       last: 0
     };
@@ -111,6 +114,9 @@
       var //satisfy lint
        mIn = media["in"],
        mOut = media["out"];
+
+      // Update sequence duration
+      self.duration += mOut-mIn;
 
       // Push the in/out points into sequence ioVideos
       self.inOuts.ofVideos.push({
@@ -200,6 +206,14 @@
           }
         }
       }, false );
+
+      media.addEventListener( "ended", function( event ) {
+
+        var target = event.srcElement || event.target,
+            seqIdx = +(  (target.dataset && target.dataset.sequenceId) || target.getAttribute("data-sequence-id") );
+
+        Popcorn.sequence.cycle.call( self, seqIdx );
+      }, false );
     });
 
     return this;
@@ -213,6 +227,11 @@
     if ( !this.queue ) {
       Popcorn.error("Popcorn.sequence.cycle is not a public method");
     }
+
+    // Prevent going to the minus first clip of sequence! Possible with calling seq.jumpTo
+	if (idx < 0) {
+		idx = 0;
+	}
 
     var // Localize references
     queue = this.queue,
@@ -305,25 +324,33 @@
     clip: function( idx ) {
       return this.inOuts.ofVideos[ idx ];
     },
-    // Returns sum duration for all videos in sequence
-    duration: function() {
 
-      var ret = 0,
-          seq = this.inOuts.ofClips,
-          idx = 0;
 
-      for ( ; idx < seq.length; idx++ ) {
-        ret += seq[ idx ]["out"] - seq[ idx ]["in"] + 1;
-      }
-
-      return ret - 1;
-    },
-
+    // Continue playing the whole Sequence. Check first if the current video is the last in sequence. If so and it already reached its OUT-Time then dont play it! Otherwise Sequence playes more then it shall do
     play: function() {
 
-      this.playlist[ this.active ].play();
+
+      if (((this.queue.length-1) == this.active) &&
+           (this.inOuts["ofVideos"][this.active]["out"] >= Math.round(this.queue[this.active].currentTime)))
+  		{
+  			return this;
+
+  		} else {
+
+     		this.queue[ this.active ].play();
+
+  		}
 
       return this;
+    },
+
+    // Pause the sequence
+    pause: function() {
+
+    	this.queue[ this.active ].pause();
+
+      return this;
+
     },
     // Attach an event to a single point in time
     cue: function ( time, fn ) {
@@ -425,10 +452,12 @@
       }
       return this;
     },
+
+    // Get the currentTime of the whole Sequence and not from the video/clip actually playing
     currentTime: function() {
 
       var index = this.active,
-          currentTime = 0;
+          currentTime = 0.5;
 
       this.inOuts.ofClips.forEach(function( off, idx ) {
         if ( idx < index ) {
@@ -436,11 +465,12 @@
         }
       }, this );
 
-      currentTime += this.playlist[ index ].currentTime() - this.inOuts.ofVideos[ index ]["in"];
+      currentTime += this.queue[ index ].currentTime - this.inOuts.ofVideos[ index ]["in"];
 
 
       return currentTime;
     },
+
     jumpTo: function( time ) {
       var index, found, real;
 
@@ -459,6 +489,12 @@
                   ( inOuts.ofClips[ idx ]["in"] - time );
         }
       }, this );
+
+      // Hide and Pause current playing Video to prevent two videos of being played or being visible at the same time
+      if (this.active != index) {
+      	this.queue[this.active].pause()
+      	this.queue[this.active].style.display = "none";
+      }
 
       Popcorn.sequence.cycle.call( this, index - 1 );
 
