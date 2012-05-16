@@ -329,7 +329,7 @@
            (this.inOuts["ofVideos"][this.active]["out"] >= Math.round(this.queue[this.active].currentTime)))
     	{
         
-  			return this;
+  			this.jumpTo(0);
   			
   		} else {
   			
