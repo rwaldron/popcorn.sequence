@@ -216,11 +216,15 @@
 
   Popcorn.sequence.init.prototype = Popcorn.sequence.prototype;
 
-  //
   Popcorn.sequence.cycle = function( fromIdx, toIdx ) {
 
     if ( !this.queue ) {
       Popcorn.error("Popcorn.sequence.cycle is not a public method");
+    }
+
+    // no cycle needed, bail
+    if ( fromIdx === toIdx ) {
+      return this;
     }
 
     // Localize references
@@ -255,7 +259,6 @@
       $popnext = this.playlist[ nextIdx ];
       $popprev = this.playlist[ fromIdx ];
 
-      // When not resetting to 0
       current.pause();
 
       this.active = nextIdx;
@@ -264,7 +267,7 @@
       // Play the next video in the sequence
       $popnext.currentTime( clip["in"] );
 
-      $popnext[ nextIdx ? "play" : "pause" ]();
+      $popnext.play();
 
       // Trigger custom cycling event hook
       this.trigger( "cycle", {
@@ -276,15 +279,10 @@
 
       });
 
-      // Set the previous back to it's beginning time
-      // $popprev.currentTime( ioVideos[ idx ].in );
-
-      if ( nextIdx ) {
-        // Hide the currently ending video
-        current.style.display = "none";
-        // Show the next video in the sequence
-        next.style.display = "";
-      }
+      // Hide the currently ending video
+      current.style.display = "none";
+      // Show the next video in the sequence
+      next.style.display = "";
 
       this.cycling = false;
     }
@@ -433,30 +431,35 @@
       return currentTime;
     },
     jumpTo: function( time ) {
-      var index, found, real,
+    
+      if ( time < 0 || time > this.duration() ) {
+        return this;
+      }
+
+      var index, found, real, curInOuts;
           offsetTime = 0;
 
       found = false;
 
       this.inOuts.ofClips.forEach(function( off, idx ) {
         var inOuts = this.inOuts;
-
-        if ( !found &&
-              (time >= inOuts.ofClips[ idx ]["in"] &&
+        if ( !found ) {
+          if ( (time >= inOuts.ofClips[ idx ]["in"] &&
                 time <= inOuts.ofClips[ idx ]["out"]) ) {
 
-          found = true;
-          index = idx;
-          real = inOuts.ofVideos[ idx ]["in"] +
-                  ( inOuts.ofClips[ idx ]["in"] - ( time - offsetTime ) );
-        } else {
-          offsetTime += inOuts.ofClips[ idx ]["out"] - offsetTime;
+            found = true;
+            index = idx;
+            real = ( time - offsetTime ) + inOuts.ofVideos[ idx ]["in"];
+          } else {
+            offsetTime += inOuts.ofClips[ idx ]["out"] - offsetTime;
+          }
         }
       }, this );
       Popcorn.sequence.cycle.call( this, this.active, index );
+      curInOuts = this.inOuts.ofVideos[ index ]
 
-      // Jump to the calculated time in the clip
-      this.playlist[ index ].currentTime( real );
+      // Jump to the calculated time in the clip, making sure it's in the correct range
+      this.playlist[ index ].currentTime( real >= curInOuts["in"] && real <= curInOuts["out"] ? real : curInOuts["in"] );
 
       return this;
     }
