@@ -217,34 +217,29 @@
   Popcorn.sequence.init.prototype = Popcorn.sequence.prototype;
 
   //
-  Popcorn.sequence.cycle = function( idx ) {
+  Popcorn.sequence.cycle = function( fromIdx, toIdx ) {
 
     if ( !this.queue ) {
       Popcorn.error("Popcorn.sequence.cycle is not a public method");
     }
 
-    var // Localize references
-    queue = this.queue,
-    ioVideos = this.inOuts.ofVideos,
-    current = queue[ idx ],
-    nextIdx = 0,
-    next, clip;
+    // Localize references
+    var queue = this.queue,
+        ioVideos = this.inOuts.ofVideos,
+        current = queue[ fromIdx ],
+        nextIdx, next, clip;
 
+    // Popcorn instances
+    var $popnext,
+        $popprev;
 
-    var // Popcorn instances
-    $popnext,
-    $popprev;
-
-
-    if ( queue[ idx + 1 ] ) {
-      nextIdx = idx + 1;
-    }
+    nextIdx = typeof toIdx === "number" ? toIdx : fromIdx + 1;
 
     // Reset queue
-    if ( !queue[ idx + 1 ] ) {
+    if ( !queue[ nextIdx ] ) {
 
       nextIdx = 0;
-      this.playlist[ idx ].pause();
+      this.playlist[ fromIdx ].pause();
 
     } else {
 
@@ -258,7 +253,7 @@
       });
 
       $popnext = this.playlist[ nextIdx ];
-      $popprev = this.playlist[ idx ];
+      $popprev = this.playlist[ fromIdx ];
 
       // When not resetting to 0
       current.pause();
@@ -275,7 +270,7 @@
       this.trigger( "cycle", {
 
         position: {
-          previous: idx,
+          previous: fromIdx,
           current: nextIdx
         }
 
@@ -426,7 +421,6 @@
       return this;
     },
     currentTime: function() {
-
       var index = this.active,
           currentTime = 0;
 
@@ -435,13 +429,12 @@
           currentTime += this.inOuts.ofVideos[ idx ]["out"] - this.inOuts.ofVideos[ idx ]["in"];
         }
       }, this );
-
       currentTime += this.playlist[ index ].currentTime() - this.inOuts.ofVideos[ index ]["in"];
-
       return currentTime;
     },
     jumpTo: function( time ) {
-      var index, found, real;
+      var index, found, real,
+          offsetTime = 0;
 
       found = false;
 
@@ -455,11 +448,12 @@
           found = true;
           index = idx;
           real = inOuts.ofVideos[ idx ]["in"] +
-                  ( inOuts.ofClips[ idx ]["in"] - time );
+                  ( inOuts.ofClips[ idx ]["in"] - ( time - offsetTime ) );
+        } else {
+          offsetTime += inOuts.ofClips[ idx ]["out"] - offsetTime;
         }
       }, this );
-
-      Popcorn.sequence.cycle.call( this, index - 1 );
+      Popcorn.sequence.cycle.call( this, this.active, index );
 
       // Jump to the calculated time in the clip
       this.playlist[ index ].currentTime( real );

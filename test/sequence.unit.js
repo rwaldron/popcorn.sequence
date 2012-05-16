@@ -58,9 +58,6 @@ var useOgv = document.createElement("video").canPlayType("video/ogg") === "maybe
       }
     ];
 
-//$seq = Popcorn.sequence( "seq-fixture", clips );
-//$seq.play();
-
 module("API");
 test("Popcorn.sequence", function() {
 
@@ -154,7 +151,6 @@ test("Popcorn.sequence.prototype", function() {
       seq = Popcorn.sequence( "video-sequence-a", localMediaList ),
       fns = Object.getOwnPropertyNames( Popcorn.sequence.prototype );
 
-
   expects += (fns.length - 1) * 2;
 
   expect( expects );
@@ -198,7 +194,6 @@ test("local media", function() {
 
   stop();
 
-
   var seq = Popcorn.sequence( "video-sequence-a", localMediaList ),
       $videos = document.getElementById("qunit-fixture").querySelectorAll("video");
 
@@ -231,8 +226,6 @@ test("remote media", function() {
 
 });
 
-
-
 module("Access");
 test("local media", function() {
 
@@ -249,7 +242,6 @@ test("local media", function() {
   }
 
   stop();
-
 
   var seq = Popcorn.sequence( "video-sequence-a", localMediaList );
 
@@ -293,7 +285,6 @@ if ( !useOgv ) {
   module("Events");
   test("local media", function () {
 
-
     var expects = 2,
         count = 0;
 
@@ -317,7 +308,6 @@ if ( !useOgv ) {
 
     });
 
-
     seq.on( "canplaythrough", function( event ) {
 
       ok( true, "`canplaythrough` fired for all in sequence" );
@@ -328,7 +318,6 @@ if ( !useOgv ) {
   });
 
   test("remote media", function () {
-
 
     var expects = 2,
         count = 0;
@@ -474,7 +463,6 @@ asyncTest("Finished Sequence Tests", function () {
   var seq = Popcorn.sequence( "video-sequence-a", remoteMediaList );
 
   seq.on( "pause", function() {
-
     if ( seq.active === seq.playlist.length - 1 && seq.playlist[seq.active].media.currentTime >  seq.inOuts.ofVideos[seq.active].in ) {
       equal( Math.floor(seq.playlist[ seq.active ].media.currentTime), seq.inOuts.ofVideos[ seq.active ].out, "The sequence had ended at the correct time" );
       plus();
@@ -499,7 +487,6 @@ test("on(Custom)/trigger(Custom)", function () {
 
   var seq = Popcorn.sequence( "video-sequence-b", mixedSourceList );
 
-
   // unamed function expression
   seq.on("foo", function( event, data ) {
 
@@ -507,7 +494,6 @@ test("on(Custom)/trigger(Custom)", function () {
     deepEqual( data, { a: "alpha" }, "Correct data was passed to callback, " + JSON.stringify({ a: "alpha" }) );
 
   }).trigger("foo", { a: "alpha" });
-
 
   // named function expression
   function barFn( event, data ) {
@@ -538,15 +524,11 @@ test("Cycle", function () {
 
   stop();
 
-
   var seq = Popcorn.sequence( "video-sequence-b", mixedSourceList );
-
 
   seq.on( "canplaythrough", function( event ) {
 
     seq.on("cycle", function( event, data ) {
-
-      //console.log( "cycle: ", event, data );
 
       equal( data.position.previous, index, "previous position matches index counter" );
       plus();
@@ -558,7 +540,6 @@ test("Cycle", function () {
 
       equal( event.type, "cycle", "cycle event: " + index );
       plus();
-
 
     });
 
@@ -586,12 +567,12 @@ test("Functional", function () {
 
   function plus() {
     if ( ++count === expects ) {
+      seq.remove();
       start();
     }
   }
 
   stop();
-
 
   var seq = Popcorn.sequence( "video-sequence-b", mixedSourceList ),
       tests = [
@@ -629,7 +610,6 @@ test("Functional", function () {
       expecting = [ 2, 4, 5, 2 ],
       index = 0;
 
-
   seq.on( "canplaythrough", function( event ) {
 
     equal( seq.duration(), 10, "This sequence is 10 seconds long" );
@@ -662,12 +642,10 @@ test("Functional", function () {
 
     });
 
-
     seq.play();
   });
 
 });
-
 
 module("Sequence Time");
 asyncTest("Get the current time in the sequence, not the video", function() {
@@ -689,13 +667,14 @@ asyncTest("Get the current time in the sequence, not the video", function() {
 
         notEqual( Math.floor(seq.currentTime()), Math.floor(this.currentTime()), "Sequence time should not equal video/media currentTime" );
 
+        seq.remove();
+
         start();
       }
     });
 
     seq.play();
   });
-
 
 });
 
@@ -719,10 +698,11 @@ asyncTest("Jump to time in the sequence, not the video", function() {
       if ( seq.active === 1 && !hasRun ) {
         hasRun = true;
 
-        equal( seq.currentTime(), 1.5, "Sequence time is 2.5" );
-        equal( seq.playlist[ seq.active ].currentTime(), 4.5, "Actual video time is 5.5" );
+        equal( seq.currentTime(), 4.5, "Sequence time is 4.5" );
+        equal( seq.playlist[ seq.active ].currentTime(), 7.5, "Actual video time is 7.5" );
 
         seq.off( "timeupdate" );
+        seq.remove();
 
         start();
       }
