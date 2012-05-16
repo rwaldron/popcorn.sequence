@@ -329,6 +329,14 @@
 
       return this;
     },
+    // Pause the sequence
+    pause: function() {
+
+      this.queue[ this.active ].pause();
+
+      return this;
+
+    },
     // Attach an event to a single point in time
     cue: function ( time, fn ) {
 
