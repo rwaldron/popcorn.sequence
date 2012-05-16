@@ -730,37 +730,26 @@ asyncTest("Jump to time in the sequence, not the video", function() {
   });
 });
 
-asyncTest("pause() and play()", function() {
+asyncTest("pause() and play()", 3, function() {
 
-  expect(3);
-
-  var seq = Popcorn.sequence( "video-sequence-b", remoteMediaList ),
-      hasRun = false;
+  var seq = Popcorn.sequence( "video-sequence-b", remoteMediaList );
 
   seq.on( "loadedmetadata", function() {
 
-    // seq.play();
     seq.cue( 2, function() {
                   
     equal( seq.playing, true, "Sequence is playing" );
     
     seq.pause();
 
-      //console.log( seq.currentTime() );
-    }).on( "timeupdate", function() {
-
-      if ( seq.active === 1 && !hasRun ) {
-        hasRun = true;
-
-        start();
-      }
     }).on ("pause", function() {
+      seq.off( "pause" );
     	equal( seq.playing, false, "Sequence is paused" );
     	seq.play();
     }).cue(4,function(){
     	equal( seq.playing, true, "Sequence is playing again" );
-    	seq.off( "timeupdate" );
-        seq.remove();
+      seq.remove();
+      start();
     });
     seq.play();
   });
