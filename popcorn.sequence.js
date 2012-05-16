@@ -400,7 +400,19 @@
       return this;
     },
     off: function( type, name ) {
-      // TODO: finish implementation
+
+      var seq = this.playlist;
+
+      if ( Popcorn.Events.Natives.indexOf( type ) > -1 ) {
+        Popcorn.forEach( seq, function( video ) {
+          video.off( type, name );
+        });
+      } else {
+
+        this.events[ type ] = null;
+      }
+
+      return this;
     },
     emit: function( type, data ) {
       var self = this;
