@@ -477,6 +477,26 @@ asyncTest("Finished Sequence Tests", function () {
 
 });
 
+module("Events");
+asyncTest("on/off - sequence events (cycle)", 1, function () {
+
+  var seq = Popcorn.sequence( "video-sequence-b", mixedSourceList ),
+      cycleFired = false;
+
+  seq.on( "cycle", function() {
+    this.off( "cycle" );
+    ok( !cycleFired, "this cycle callback should be fired only once" );
+    cycleFired = !cycleFired;
+
+    this.on("cycle", function() {
+      start();
+      this.remove();
+    });
+  });
+
+  seq.play();
+
+});
 
 module("Custom Events");
 test("on(Custom)/trigger(Custom)", function () {
