@@ -323,7 +323,17 @@
 
     play: function() {
 
-      this.playlist[ this.active ].play();
+      if (((this.queue.length-1) == this.active) &&
+           (this.inOuts["ofVideos"][this.active]["out"] >= Math.round(this.queue[this.active].currentTime)))
+    	{
+        
+  			this.jumpTo(0);
+  			
+  		} else {
+  			
+     		this.queue[ this.active ].play();
+     		
+  		}
 
       return this;
     },
