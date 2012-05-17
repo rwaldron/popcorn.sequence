@@ -737,17 +737,17 @@ asyncTest("pause() and play()", 3, function() {
   seq.on( "loadedmetadata", function() {
 
     seq.cue( 2, function() {
-                  
+
     equal( seq.playing, true, "Sequence is playing" );
-    
+
     seq.pause();
 
     }).on ("pause", function() {
       seq.off( "pause" );
-    	equal( seq.playing, false, "Sequence is paused" );
-    	seq.play();
+      equal( seq.playing, false, "Sequence is paused" );
+      seq.play();
     }).cue(4,function(){
-    	equal( seq.playing, true, "Sequence is playing again" );
+      equal( seq.playing, true, "Sequence is playing again" );
       seq.remove();
       start();
     });
@@ -756,30 +756,29 @@ asyncTest("pause() and play()", 3, function() {
 });
 
 
-asyncTest("play() after sequence ended", 2, function() {
+asyncTest( "play() after sequence ended", 2, function() {
 
   var seq = Popcorn.sequence( "video-sequence-b", remoteMediaList ),
-      hasRun = false,
-      endet = 0;
-                  
+      ended = 0;
+
   seq.on( "loadedmetadata", function() {
 
     seq.on( "pause", function() {
-       if (seq.currentTime() >= seq.duration()) {
+       if ( seq.currentTime() >= seq.duration() ) {
 
-          if (!seq.playing) {
-            endet = 1;
+          if ( !seq.playing ) {
+            ended = 1;
           }
-                  		    
+
           seq.play();
-                  		    
-          seq.cue(2, function() {
-                  		    	
+
+          seq.cue( 2, function() {
+
             start();
-            equal( endet, 1, "Sequence ended" );
+            equal( ended, 1, "Sequence ended" );
             equal( seq.active, 0, "Sequence cycle started from beginning" );
-            hasRun = true;
             seq.remove();
+            start();
           })
         }
       })
